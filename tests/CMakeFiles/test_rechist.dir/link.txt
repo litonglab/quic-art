@@ -1,0 +1,1 @@
+/usr/bin/cc   -DLSQUIC_DEBUG_NEXT_ADV_TICK=1 -DLSQUIC_CONN_STATS=1 -Wall -Wextra -Wno-unused-parameter -fno-omit-frame-pointer -fPIC -Wno-missing-field-initializers -O0 -g3  -DLSQUIC_TEST=1 -Wno-unused-value -Wno-override-init -g CMakeFiles/test_rechist.dir/test_rechist.c.o CMakeFiles/test_rechist.dir/__/src/liblsquic/lsquic_rechist.c.o -o test_rechist 
