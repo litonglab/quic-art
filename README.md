@@ -1,12 +1,22 @@
+# About
+
+This repository contains the source code of ART, the implementation of QUIC-ART in paper "ART: Adaptive Retransmission for Wide-Area Loss Recovery in the Wild (IEEE ICNP'23)".
+
+ART is short for Adaptive ReTransmission. ART is a sender-side scheme, which minimizes the recovery time of lost packets with minimal redundancy cost. Distinguishing itself from forward-error-correction (FEC), which preemptively sends redundant data packets to prevent loss, ART functions as an automatic-repeat-request (ARQ) scheme. It applies redundancy specifically to lost packets instead of unlost packets, thereby addressing the characteristic patterns of wide-area losses in real-world scenarios.
+
+Please cite this paper as follows:
+
+- Tong Li, Wei Liu, Xinyu Ma, Shuaipeng Zhu, Jinkun Cao, Senzhen Liu, Taotao Zhang, Yinfeng Zhu, Bo Wu, Ke Xu. ART: Adaptive Retransmission for Wide-Area Loss Recovery in the Wild. IEEE International Conference on Network Protocols (ICNP), pp.1-11, 2023.10.10.
+
 [![Linux and MacOS build status](https://ci.appveyor.com/api/projects/status/x790ve5msewmva2b/branch/master?svg=true)](https://ci.appveyor.com/project/litespeedtech/lsquic-linux/branch/master)
 [![Windows build status](https://ci.appveyor.com/api/projects/status/ij4n3vy343pkgm1j/branch/master?svg=true)](https://ci.appveyor.com/project/litespeedtech/lsquic-windows/branch/master)
 [![FreeBSD build status](https://api.cirrus-ci.com/github/litespeedtech/lsquic.svg)](https://cirrus-ci.com/github/litespeedtech/lsquic)
 [![Documentation Status](https://readthedocs.org/projects/lsquic/badge/?version=latest)](https://lsquic.readthedocs.io/en/latest/?badge=latest)
 
-LiteSpeed QUIC (LSQUIC) Library README
+# LiteSpeed QUIC (LSQUIC) Library README (Source: LiteSpeed Team https://github.com/litespeedtech/lsquic)
 =============================================
 
-Description
+## Description
 -----------
 
 LiteSpeed QUIC (LSQUIC) Library is an open-source implementation of QUIC
@@ -17,7 +27,7 @@ and OpenLiteSpeed.
 Currently supported QUIC versions are v1, Internet-Draft versions 29, and 27;
 and the older "Google" QUIC versions Q043, Q046, an Q050.
 
-Documentation
+## Documentation
 -------------
 
 Documentation is available at https://lsquic.readthedocs.io/en/latest/.
@@ -25,13 +35,13 @@ Documentation is available at https://lsquic.readthedocs.io/en/latest/.
 In addition, see example programs for API usage and EXAMPLES.txt for
 some compilation and run-time options.
 
-Requirements
+## Requirements
 ------------
 
 To build LSQUIC, you need CMake, zlib, and BoringSSL.  The example program
 uses libevent to provide the event loop.
 
-Building BoringSSL
+## Building BoringSSL
 ------------------
 
 BoringSSL is not packaged; you have to build it yourself.  The process is
@@ -76,7 +86,7 @@ as as shared library) do:
 cmake -DBUILD_SHARED_LIBS=1 . && make
 ```
 
-Building LSQUIC Library
+## Building LSQUIC Library
 -----------------------
 
 LSQUIC's `http_client`, `http_server`, and the tests link BoringSSL
@@ -117,7 +127,7 @@ make
 make test
 ```
 
-Building with Docker
+## Building with Docker
 ---------
 The library and the example client and server can be built with Docker.
 
@@ -139,7 +149,7 @@ sudo docker run -it --rm lsquic http_client -s www.google.com  -p / -o version=h
 sudo docker run -p 12345:12345/udp -v /path/to/certs:/mnt/certs -it --rm lsquic http_server -c www.example.com,/mnt/certs/chain,/mnt/certs/key
 ```
 
-Platforms
+## Platforms
 ---------
 
 The library has been tested on the following platforms:
@@ -157,15 +167,3 @@ The library has been tested on the following platforms:
   - ARM
 - Windows
   - x86_64
-
-Get Involved
-------------
-
-Do not hesitate to report bugs back to us.  Even better, send us fixes
-and improvements!
-
-Have fun,
-
-LiteSpeed QUIC Team.
-
-Copyright (c) 2017 - 2021 LiteSpeed Technologies Inc
