@@ -1,0 +1,1229 @@
+Start testing: Feb 12 18:05 CST
+----------------------------------------------------------
+1/63 Testing: ack
+1/63 Test: ack
+Command: "/home/liuwei/lsquic/tests/test_ack"
+Directory: /home/liuwei/lsquic/tests
+"ack" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.11 sec
+----------------------------------------------------------
+Test Passed.
+"ack" end time: Feb 12 18:05 CST
+"ack" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/63 Testing: ackgen_gquic_be
+2/63 Test: ackgen_gquic_be
+Command: "/home/liuwei/lsquic/tests/test_ackgen_gquic_be"
+Directory: /home/liuwei/lsquic/tests
+"ackgen_gquic_be" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+[DEBUG] parse: lsquic_gquic_be_gen_ack_frame: diff: 134184960; encoded: 0xFF87
+[DEBUG] parse: lsquic_gquic_be_gen_ack_frame: diff: 0; encoded: 0x0000
+[DEBUG] parse: lsquic_gquic_be_gen_ack_frame: diff: 0; encoded: 0x0000
+[DEBUG] parse: lsquic_gquic_be_gen_ack_frame: diff: 0; encoded: 0x0000
+[DEBUG] parse: lsquic_gquic_be_gen_ack_frame: diff: 0; encoded: 0x0000
+[DEBUG] parse: lsquic_gquic_be_gen_ack_frame: diff: 0; encoded: 0x0000
+[DEBUG] parse: lsquic_gquic_be_gen_ack_frame: diff: 0; encoded: 0x0000
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ackgen_gquic_be" end time: Feb 12 18:05 CST
+"ackgen_gquic_be" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/63 Testing: ackparse_gquic_be
+3/63 Test: ackparse_gquic_be
+Command: "/home/liuwei/lsquic/tests/test_ackparse_gquic_be"
+Directory: /home/liuwei/lsquic/tests
+"ackparse_gquic_be" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ackparse_gquic_be" end time: Feb 12 18:05 CST
+"ackparse_gquic_be" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/63 Testing: ackparse_ietf
+4/63 Test: ackparse_ietf
+Command: "/home/liuwei/lsquic/tests/test_ackparse_ietf"
+Directory: /home/liuwei/lsquic/tests
+"ackparse_ietf" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ackparse_ietf" end time: Feb 12 18:05 CST
+"ackparse_ietf" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/63 Testing: alarmset
+5/63 Test: alarmset
+Command: "/home/liuwei/lsquic/tests/test_alarmset"
+Directory: /home/liuwei/lsquic/tests
+"alarmset" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"alarmset" end time: Feb 12 18:05 CST
+"alarmset" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/63 Testing: alt_svc_ver
+6/63 Test: alt_svc_ver
+Command: "/home/liuwei/lsquic/tests/test_alt_svc_ver"
+Directory: /home/liuwei/lsquic/tests
+"alt_svc_ver" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"alt_svc_ver" end time: Feb 12 18:05 CST
+"alt_svc_ver" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/63 Testing: arr
+7/63 Test: arr
+Command: "/home/liuwei/lsquic/tests/test_arr"
+Directory: /home/liuwei/lsquic/tests
+"arr" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"arr" end time: Feb 12 18:05 CST
+"arr" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/63 Testing: attq
+8/63 Test: attq
+Command: "/home/liuwei/lsquic/tests/test_attq"
+Directory: /home/liuwei/lsquic/tests
+"attq" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"attq" end time: Feb 12 18:05 CST
+"attq" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/63 Testing: blocked_gquic_be
+9/63 Test: blocked_gquic_be
+Command: "/home/liuwei/lsquic/tests/test_blocked_gquic_be"
+Directory: /home/liuwei/lsquic/tests
+"blocked_gquic_be" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"blocked_gquic_be" end time: Feb 12 18:05 CST
+"blocked_gquic_be" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/63 Testing: bw_sampler
+10/63 Test: bw_sampler
+Command: "/home/liuwei/lsquic/tests/test_bw_sampler"
+Directory: /home/liuwei/lsquic/tests
+"bw_sampler" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"bw_sampler" end time: Feb 12 18:05 CST
+"bw_sampler" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/63 Testing: conn_close_gquic_be
+11/63 Test: conn_close_gquic_be
+Command: "/home/liuwei/lsquic/tests/test_conn_close_gquic_be"
+Directory: /home/liuwei/lsquic/tests
+"conn_close_gquic_be" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"conn_close_gquic_be" end time: Feb 12 18:05 CST
+"conn_close_gquic_be" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/63 Testing: crypto_gen
+12/63 Test: crypto_gen
+Command: "/home/liuwei/lsquic/tests/test_crypto_gen"
+Directory: /home/liuwei/lsquic/tests
+"crypto_gen" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"crypto_gen" end time: Feb 12 18:05 CST
+"crypto_gen" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/63 Testing: cubic
+13/63 Test: cubic
+Command: "/home/liuwei/lsquic/tests/test_cubic"
+Directory: /home/liuwei/lsquic/tests
+"cubic" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"cubic" end time: Feb 12 18:05 CST
+"cubic" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/63 Testing: dec
+14/63 Test: dec
+Command: "/home/liuwei/lsquic/tests/test_dec"
+Directory: /home/liuwei/lsquic/tests
+"dec" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+buffers are not aligned
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"dec" end time: Feb 12 18:05 CST
+"dec" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/63 Testing: di_nocopy
+15/63 Test: di_nocopy
+Command: "/home/liuwei/lsquic/tests/test_di_nocopy"
+Directory: /home/liuwei/lsquic/tests
+"di_nocopy" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"di_nocopy" end time: Feb 12 18:05 CST
+"di_nocopy" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/63 Testing: elision
+16/63 Test: elision
+Command: "/home/liuwei/lsquic/tests/test_elision"
+Directory: /home/liuwei/lsquic/tests
+"elision" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"elision" end time: Feb 12 18:05 CST
+"elision" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/63 Testing: engine_ctor
+17/63 Test: engine_ctor
+Command: "/home/liuwei/lsquic/tests/test_engine_ctor"
+Directory: /home/liuwei/lsquic/tests
+"engine_ctor" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"engine_ctor" end time: Feb 12 18:05 CST
+"engine_ctor" time elapsed: 00:00:00
+----------------------------------------------------------
+
+18/63 Testing: export_key
+18/63 Test: export_key
+Command: "/home/liuwei/lsquic/tests/test_export_key"
+Directory: /home/liuwei/lsquic/tests
+"export_key" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"export_key" end time: Feb 12 18:05 CST
+"export_key" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/63 Testing: frame_chop
+19/63 Test: frame_chop
+Command: "/home/liuwei/lsquic/tests/test_frame_chop"
+Directory: /home/liuwei/lsquic/tests
+"frame_chop" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"frame_chop" end time: Feb 12 18:05 CST
+"frame_chop" time elapsed: 00:00:00
+----------------------------------------------------------
+
+20/63 Testing: frame_reader
+20/63 Test: frame_reader
+Command: "/home/liuwei/lsquic/tests/test_frame_reader"
+Directory: /home/liuwei/lsquic/tests
+"frame_reader" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"frame_reader" end time: Feb 12 18:05 CST
+"frame_reader" time elapsed: 00:00:00
+----------------------------------------------------------
+
+21/63 Testing: frame_writer
+21/63 Test: frame_writer
+Command: "/home/liuwei/lsquic/tests/test_frame_writer"
+Directory: /home/liuwei/lsquic/tests
+"frame_writer" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"frame_writer" end time: Feb 12 18:05 CST
+"frame_writer" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/63 Testing: goaway_gquic_be
+22/63 Test: goaway_gquic_be
+Command: "/home/liuwei/lsquic/tests/test_goaway_gquic_be"
+Directory: /home/liuwei/lsquic/tests
+"goaway_gquic_be" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"goaway_gquic_be" end time: Feb 12 18:05 CST
+"goaway_gquic_be" time elapsed: 00:00:00
+----------------------------------------------------------
+
+23/63 Testing: hkdf
+23/63 Test: hkdf
+Command: "/home/liuwei/lsquic/tests/test_hkdf"
+Directory: /home/liuwei/lsquic/tests
+"hkdf" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"hkdf" end time: Feb 12 18:05 CST
+"hkdf" time elapsed: 00:00:00
+----------------------------------------------------------
+
+24/63 Testing: hpi
+24/63 Test: hpi
+Command: "/home/liuwei/lsquic/tests/test_hpi"
+Directory: /home/liuwei/lsquic/tests
+"hpi" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+[DEBUG] [QUIC:] hpi: line-61: lsquic_hpi_next: return stream 0, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-67: initialized; # elems: 3; sets: [ 00000010, 00000000 ]
+[DEBUG] [QUIC:] hpi: line-67: lsquic_hpi_next: return stream 0, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-67: lsquic_hpi_next: return stream 1, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-67: lsquic_hpi_next: return stream 2, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-76: initialized; # elems: 3; sets: [ 00000000, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-76: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-76: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-76: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-85: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-85: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-96: initialized; # elems: 6; sets: [ 00000010, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 3, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 6, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 10, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-107: initialized; # elems: 3; sets: [ 00000000, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-107: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-107: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-107: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-115: initialized; # elems: 3; sets: [ 00000000, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-115: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-115: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-115: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-123: initialized; # elems: 6; sets: [ 00000010, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-123: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-123: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-123: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-132: initialized; # elems: 6; sets: [ 00000010, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-132: lsquic_hpi_next: return stream 3, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-132: lsquic_hpi_next: return stream 6, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-132: lsquic_hpi_next: return stream 10, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-141: initialized; # elems: 6; sets: [ 000000E0, 0000001C ]
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 1, incr: 1, priority 2
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 2, incr: 1, priority 3
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 3, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 4, incr: 0, priority 5
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 5, incr: 0, priority 6
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 6, incr: 0, priority 7
+[DEBUG] [QUIC:] hpi: line-149: initialized; # elems: 6; sets: [ 000000A0, 0000000D ]
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 3333, incr: 1, priority 0
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 2222, incr: 1, priority 0
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 1, incr: 1, priority 2
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 2, incr: 1, priority 3
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 4, incr: 0, priority 5
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 6, incr: 0, priority 7
+[DEBUG] [QUIC:] hpi: line-157: initialized; # elems: 6; sets: [ 000000A0, 0000000D ]
+[DEBUG] [QUIC:] hpi: line-157: lsquic_hpi_next: return stream 1, incr: 1, priority 2
+[DEBUG] [QUIC:] hpi: line-157: lsquic_hpi_next: return stream 2, incr: 1, priority 3
+[DEBUG] [QUIC:] hpi: line-157: lsquic_hpi_next: return stream 4, incr: 0, priority 5
+[DEBUG] [QUIC:] hpi: line-157: lsquic_hpi_next: return stream 6, incr: 0, priority 7
+[DEBUG] [QUIC:] hpi: line-166: initialized; # elems: 6; sets: [ 000000A0, 0000000D ]
+[DEBUG] [QUIC:] hpi: line-166: lsquic_hpi_next: return stream 3333, incr: 1, priority 0
+[DEBUG] [QUIC:] hpi: line-166: lsquic_hpi_next: return stream 2222, incr: 1, priority 0
+[DEBUG] [QUIC:] hpi: line-175: initialized; # elems: 6; sets: [ 0000000C, 00000000 ]
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 1, incr: 0, priority 2
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 5, incr: 0, priority 2
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 6, incr: 0, priority 2
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 2, incr: 0, priority 3
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 3, incr: 0, priority 3
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 4, incr: 0, priority 3
+[DEBUG] [QUIC:] hpi: line-61: lsquic_hpi_next: return stream 0, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-67: initialized; # elems: 3; sets: [ 00000010, 00000000 ]
+[DEBUG] [QUIC:] hpi: line-67: lsquic_hpi_next: return stream 0, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-67: lsquic_hpi_next: return stream 1, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-67: lsquic_hpi_next: return stream 2, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-76: initialized; # elems: 3; sets: [ 00000000, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-76: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-76: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-76: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-85: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-85: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-96: initialized; # elems: 6; sets: [ 00000010, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 3, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 6, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 10, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-107: initialized; # elems: 3; sets: [ 00000000, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-107: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-107: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-107: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-115: initialized; # elems: 3; sets: [ 00000000, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-115: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-115: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-115: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-123: initialized; # elems: 6; sets: [ 00000010, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-123: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-123: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-123: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-132: initialized; # elems: 6; sets: [ 00000010, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-132: lsquic_hpi_next: return stream 3, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-132: lsquic_hpi_next: return stream 6, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-132: lsquic_hpi_next: return stream 10, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-141: initialized; # elems: 6; sets: [ 000000E0, 0000001C ]
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 1, incr: 1, priority 2
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 2, incr: 1, priority 3
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 3, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 4, incr: 0, priority 5
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 5, incr: 0, priority 6
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 6, incr: 0, priority 7
+[DEBUG] [QUIC:] hpi: line-149: initialized; # elems: 6; sets: [ 000000A0, 0000000D ]
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 3333, incr: 1, priority 0
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 2222, incr: 1, priority 0
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 1, incr: 1, priority 2
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 2, incr: 1, priority 3
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 4, incr: 0, priority 5
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 6, incr: 0, priority 7
+[DEBUG] [QUIC:] hpi: line-157: initialized; # elems: 6; sets: [ 000000A0, 0000000D ]
+[DEBUG] [QUIC:] hpi: line-157: lsquic_hpi_next: return stream 1, incr: 1, priority 2
+[DEBUG] [QUIC:] hpi: line-157: lsquic_hpi_next: return stream 2, incr: 1, priority 3
+[DEBUG] [QUIC:] hpi: line-157: lsquic_hpi_next: return stream 4, incr: 0, priority 5
+[DEBUG] [QUIC:] hpi: line-157: lsquic_hpi_next: return stream 6, incr: 0, priority 7
+[DEBUG] [QUIC:] hpi: line-166: initialized; # elems: 6; sets: [ 000000A0, 0000000D ]
+[DEBUG] [QUIC:] hpi: line-166: lsquic_hpi_next: return stream 3333, incr: 1, priority 0
+[DEBUG] [QUIC:] hpi: line-166: lsquic_hpi_next: return stream 2222, incr: 1, priority 0
+[DEBUG] [QUIC:] hpi: line-175: initialized; # elems: 6; sets: [ 0000000C, 00000000 ]
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 1, incr: 0, priority 2
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 5, incr: 0, priority 2
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 6, incr: 0, priority 2
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 2, incr: 0, priority 3
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 3, incr: 0, priority 3
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 4, incr: 0, priority 3
+[DEBUG] [QUIC:] hpi: line-61: lsquic_hpi_next: return stream 0, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-67: initialized; # elems: 3; sets: [ 00000010, 00000000 ]
+[DEBUG] [QUIC:] hpi: line-67: lsquic_hpi_next: return stream 0, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-67: lsquic_hpi_next: return stream 1, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-67: lsquic_hpi_next: return stream 2, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-76: initialized; # elems: 3; sets: [ 00000000, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-76: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-76: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-76: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-85: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-85: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-96: initialized; # elems: 6; sets: [ 00000010, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 3, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 6, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 10, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-107: initialized; # elems: 3; sets: [ 00000000, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-107: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-107: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-107: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-115: initialized; # elems: 3; sets: [ 00000000, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-115: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-115: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-115: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-123: initialized; # elems: 6; sets: [ 00000010, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-123: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-123: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-123: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-132: initialized; # elems: 6; sets: [ 00000010, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-132: lsquic_hpi_next: return stream 3, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-132: lsquic_hpi_next: return stream 6, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-132: lsquic_hpi_next: return stream 10, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-141: initialized; # elems: 6; sets: [ 000000E0, 0000001C ]
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 1, incr: 1, priority 2
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 2, incr: 1, priority 3
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 3, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 4, incr: 0, priority 5
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 5, incr: 0, priority 6
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 6, incr: 0, priority 7
+[DEBUG] [QUIC:] hpi: line-149: initialized; # elems: 6; sets: [ 000000A0, 0000000D ]
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 3333, incr: 1, priority 0
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 2222, incr: 1, priority 0
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 1, incr: 1, priority 2
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 2, incr: 1, priority 3
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 4, incr: 0, priority 5
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 6, incr: 0, priority 7
+[DEBUG] [QUIC:] hpi: line-157: initialized; # elems: 6; sets: [ 000000A0, 0000000D ]
+[DEBUG] [QUIC:] hpi: line-157: lsquic_hpi_next: return stream 1, incr: 1, priority 2
+[DEBUG] [QUIC:] hpi: line-157: lsquic_hpi_next: return stream 2, incr: 1, priority 3
+[DEBUG] [QUIC:] hpi: line-157: lsquic_hpi_next: return stream 4, incr: 0, priority 5
+[DEBUG] [QUIC:] hpi: line-157: lsquic_hpi_next: return stream 6, incr: 0, priority 7
+[DEBUG] [QUIC:] hpi: line-166: initialized; # elems: 6; sets: [ 000000A0, 0000000D ]
+[DEBUG] [QUIC:] hpi: line-166: lsquic_hpi_next: return stream 3333, incr: 1, priority 0
+[DEBUG] [QUIC:] hpi: line-166: lsquic_hpi_next: return stream 2222, incr: 1, priority 0
+[DEBUG] [QUIC:] hpi: line-175: initialized; # elems: 6; sets: [ 0000000C, 00000000 ]
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 1, incr: 0, priority 2
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 5, incr: 0, priority 2
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 6, incr: 0, priority 2
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 2, incr: 0, priority 3
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 3, incr: 0, priority 3
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 4, incr: 0, priority 3
+[DEBUG] [QUIC:] hpi: line-61: lsquic_hpi_next: return stream 0, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-67: initialized; # elems: 3; sets: [ 00000010, 00000000 ]
+[DEBUG] [QUIC:] hpi: line-67: lsquic_hpi_next: return stream 0, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-67: lsquic_hpi_next: return stream 1, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-67: lsquic_hpi_next: return stream 2, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-76: initialized; # elems: 3; sets: [ 00000000, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-76: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-76: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-76: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-85: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-85: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-96: initialized; # elems: 6; sets: [ 00000010, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 3, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 6, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 10, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-96: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-107: initialized; # elems: 3; sets: [ 00000000, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-107: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-107: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-107: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-115: initialized; # elems: 3; sets: [ 00000000, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-115: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-115: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-115: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-123: initialized; # elems: 6; sets: [ 00000010, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-123: lsquic_hpi_next: return stream 1, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-123: lsquic_hpi_next: return stream 0, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-123: lsquic_hpi_next: return stream 2, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-132: initialized; # elems: 6; sets: [ 00000010, 00000010 ]
+[DEBUG] [QUIC:] hpi: line-132: lsquic_hpi_next: return stream 3, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-132: lsquic_hpi_next: return stream 6, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-132: lsquic_hpi_next: return stream 10, incr: 0, priority 4
+[DEBUG] [QUIC:] hpi: line-141: initialized; # elems: 6; sets: [ 000000E0, 0000001C ]
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 1, incr: 1, priority 2
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 2, incr: 1, priority 3
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 3, incr: 1, priority 4
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 4, incr: 0, priority 5
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 5, incr: 0, priority 6
+[DEBUG] [QUIC:] hpi: line-141: lsquic_hpi_next: return stream 6, incr: 0, priority 7
+[DEBUG] [QUIC:] hpi: line-149: initialized; # elems: 6; sets: [ 000000A0, 0000000D ]
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 3333, incr: 1, priority 0
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 2222, incr: 1, priority 0
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 1, incr: 1, priority 2
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 2, incr: 1, priority 3
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 4, incr: 0, priority 5
+[DEBUG] [QUIC:] hpi: line-149: lsquic_hpi_next: return stream 6, incr: 0, priority 7
+[DEBUG] [QUIC:] hpi: line-157: initialized; # elems: 6; sets: [ 000000A0, 0000000D ]
+[DEBUG] [QUIC:] hpi: line-157: lsquic_hpi_next: return stream 1, incr: 1, priority 2
+[DEBUG] [QUIC:] hpi: line-157: lsquic_hpi_next: return stream 2, incr: 1, priority 3
+[DEBUG] [QUIC:] hpi: line-157: lsquic_hpi_next: return stream 4, incr: 0, priority 5
+[DEBUG] [QUIC:] hpi: line-157: lsquic_hpi_next: return stream 6, incr: 0, priority 7
+[DEBUG] [QUIC:] hpi: line-166: initialized; # elems: 6; sets: [ 000000A0, 0000000D ]
+[DEBUG] [QUIC:] hpi: line-166: lsquic_hpi_next: return stream 3333, incr: 1, priority 0
+[DEBUG] [QUIC:] hpi: line-166: lsquic_hpi_next: return stream 2222, incr: 1, priority 0
+[DEBUG] [QUIC:] hpi: line-175: initialized; # elems: 6; sets: [ 0000000C, 00000000 ]
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 1, incr: 0, priority 2
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 5, incr: 0, priority 2
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 6, incr: 0, priority 2
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 2, incr: 0, priority 3
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 3, incr: 0, priority 3
+[DEBUG] [QUIC:] hpi: line-175: lsquic_hpi_next: return stream 4, incr: 0, priority 3
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"hpi" end time: Feb 12 18:05 CST
+"hpi" time elapsed: 00:00:00
+----------------------------------------------------------
+
+25/63 Testing: lsquic_hash
+25/63 Test: lsquic_hash
+Command: "/home/liuwei/lsquic/tests/test_lsquic_hash"
+Directory: /home/liuwei/lsquic/tests
+"lsquic_hash" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.78 sec
+----------------------------------------------------------
+Test Passed.
+"lsquic_hash" end time: Feb 12 18:05 CST
+"lsquic_hash" time elapsed: 00:00:00
+----------------------------------------------------------
+
+26/63 Testing: packet_out
+26/63 Test: packet_out
+Command: "/home/liuwei/lsquic/tests/test_packet_out"
+Directory: /home/liuwei/lsquic/tests
+"packet_out" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"packet_out" end time: Feb 12 18:05 CST
+"packet_out" time elapsed: 00:00:00
+----------------------------------------------------------
+
+27/63 Testing: packet_resize
+27/63 Test: packet_resize
+Command: "/home/liuwei/lsquic/tests/test_packet_resize"
+Directory: /home/liuwei/lsquic/tests
+"packet_resize" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+18:05:30.236 [INFO] testing version Q043
+18:05:30.236 [INFO] Running test on line 89: split one packet with single STREAM frame into two
+18:05:30.237 [INFO] Running test on line 94: split one 6000-byte packet with single STREAM frame into many, looping
+18:05:30.257 [INFO] Running test on line 99: split three 1500-byte packets with several STREAM frames from different streams
+18:05:30.302 [INFO] Running test on line 110: one packet, STREAM frame and and empty STREAM FIN frame, split down by 1
+18:05:30.389 [INFO] Running test on line 115: one packet, STREAM frame and and empty STREAM FIN frame, split down by 31
+18:05:30.390 [INFO] Running test on line 120: one packet, STREAM frame with a FIN, split down by 1
+18:05:30.467 [INFO] Running test on line 125: one packet, STREAM frame with a FIN, split down by 31
+18:05:30.468 [INFO] Running test on line 130: one packet, frame too large
+18:05:30.468 [WARN] [QUIC:82000000] packet-resize: frame too large
+18:05:30.468 [INFO] Running test on line 136: split one packet with single CRYPTO frame into two
+18:05:30.468 [INFO] Not applicable to version Q043, skip
+18:05:30.468 [INFO] testing version Q046
+18:05:30.468 [INFO] Running test on line 89: split one packet with single STREAM frame into two
+18:05:30.468 [INFO] Running test on line 94: split one 6000-byte packet with single STREAM frame into many, looping
+18:05:30.487 [INFO] Running test on line 99: split three 1500-byte packets with several STREAM frames from different streams
+18:05:30.526 [INFO] Running test on line 110: one packet, STREAM frame and and empty STREAM FIN frame, split down by 1
+18:05:30.606 [INFO] Running test on line 115: one packet, STREAM frame and and empty STREAM FIN frame, split down by 31
+18:05:30.606 [INFO] Running test on line 120: one packet, STREAM frame with a FIN, split down by 1
+18:05:30.687 [INFO] Running test on line 125: one packet, STREAM frame with a FIN, split down by 31
+18:05:30.687 [INFO] Running test on line 130: one packet, frame too large
+18:05:30.687 [WARN] [QUIC:82000000] packet-resize: frame too large
+18:05:30.687 [INFO] Running test on line 136: split one packet with single CRYPTO frame into two
+18:05:30.687 [INFO] Not applicable to version Q046, skip
+18:05:30.687 [INFO] testing version Q050
+18:05:30.687 [INFO] Running test on line 89: split one packet with single STREAM frame into two
+18:05:30.687 [INFO] Running test on line 94: split one 6000-byte packet with single STREAM frame into many, looping
+18:05:30.706 [INFO] Running test on line 99: split three 1500-byte packets with several STREAM frames from different streams
+18:05:30.745 [INFO] Running test on line 110: one packet, STREAM frame and and empty STREAM FIN frame, split down by 1
+18:05:30.823 [INFO] Running test on line 115: one packet, STREAM frame and and empty STREAM FIN frame, split down by 31
+18:05:30.823 [INFO] Running test on line 120: one packet, STREAM frame with a FIN, split down by 1
+18:05:30.903 [INFO] Running test on line 125: one packet, STREAM frame with a FIN, split down by 31
+18:05:30.903 [INFO] Running test on line 130: one packet, frame too large
+18:05:30.903 [WARN] [QUIC:82000000] packet-resize: frame too large
+18:05:30.903 [INFO] Running test on line 136: split one packet with single CRYPTO frame into two
+18:05:30.903 [INFO] Not applicable to version Q050, skip
+18:05:30.903 [INFO] testing version FF00001D
+18:05:30.903 [INFO] Running test on line 89: split one packet with single STREAM frame into two
+18:05:30.903 [INFO] Running test on line 94: split one 6000-byte packet with single STREAM frame into many, looping
+18:05:30.919 [INFO] Running test on line 99: split three 1500-byte packets with several STREAM frames from different streams
+18:05:30.954 [INFO] Running test on line 110: one packet, STREAM frame and and empty STREAM FIN frame, split down by 1
+18:05:31.023 [INFO] Running test on line 115: one packet, STREAM frame and and empty STREAM FIN frame, split down by 31
+18:05:31.023 [INFO] Running test on line 120: one packet, STREAM frame with a FIN, split down by 1
+18:05:31.093 [INFO] Running test on line 125: one packet, STREAM frame with a FIN, split down by 31
+18:05:31.094 [INFO] Running test on line 130: one packet, frame too large
+18:05:31.094 [WARN] [QUIC:82000000] packet-resize: frame too large
+18:05:31.094 [INFO] Running test on line 136: split one packet with single CRYPTO frame into two
+18:05:31.094 [INFO] testing version 00000001
+18:05:31.094 [INFO] Running test on line 89: split one packet with single STREAM frame into two
+18:05:31.094 [INFO] Running test on line 94: split one 6000-byte packet with single STREAM frame into many, looping
+18:05:31.109 [INFO] Running test on line 99: split three 1500-byte packets with several STREAM frames from different streams
+18:05:31.143 [INFO] Running test on line 110: one packet, STREAM frame and and empty STREAM FIN frame, split down by 1
+18:05:31.212 [INFO] Running test on line 115: one packet, STREAM frame and and empty STREAM FIN frame, split down by 31
+18:05:31.212 [INFO] Running test on line 120: one packet, STREAM frame with a FIN, split down by 1
+18:05:31.282 [INFO] Running test on line 125: one packet, STREAM frame with a FIN, split down by 31
+18:05:31.282 [INFO] Running test on line 130: one packet, frame too large
+18:05:31.282 [WARN] [QUIC:82000000] packet-resize: frame too large
+18:05:31.282 [INFO] Running test on line 136: split one packet with single CRYPTO frame into two
+<end of output>
+Test time =   1.05 sec
+----------------------------------------------------------
+Test Passed.
+"packet_resize" end time: Feb 12 18:05 CST
+"packet_resize" time elapsed: 00:00:01
+----------------------------------------------------------
+
+28/63 Testing: packno_len
+28/63 Test: packno_len
+Command: "/home/liuwei/lsquic/tests/test_packno_len"
+Directory: /home/liuwei/lsquic/tests
+"packno_len" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"packno_len" end time: Feb 12 18:05 CST
+"packno_len" time elapsed: 00:00:00
+----------------------------------------------------------
+
+29/63 Testing: parse_packet_in
+29/63 Test: parse_packet_in
+Command: "/home/liuwei/lsquic/tests/test_parse_packet_in"
+Directory: /home/liuwei/lsquic/tests
+"parse_packet_in" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"parse_packet_in" end time: Feb 12 18:05 CST
+"parse_packet_in" time elapsed: 00:00:00
+----------------------------------------------------------
+
+30/63 Testing: purga
+30/63 Test: purga
+Command: "/home/liuwei/lsquic/tests/test_purga"
+Directory: /home/liuwei/lsquic/tests
+"purga" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.75 sec
+----------------------------------------------------------
+Test Passed.
+"purga" end time: Feb 12 18:05 CST
+"purga" time elapsed: 00:00:00
+----------------------------------------------------------
+
+31/63 Testing: qlog
+31/63 Test: qlog
+Command: "/home/liuwei/lsquic/tests/test_qlog"
+Directory: /home/liuwei/lsquic/tests
+"qlog" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+18:05:32.042 [DEBUG] [QUIC:] qlog: [12163547955811,"CONNECTIVITY","NEW_CONNECTION","LINE",{"ip_version":"4","srcip":"10.0.0.1","dstip":"10.0.0.2","srcport":"12345","dstport":"443"}]
+18:05:32.042 [DEBUG] [QUIC:] qlog: [12163547955903,"CONNECTIVITY","HANDSHAKE","PACKET_RX",{"status":"complete"}]
+18:05:32.042 [DEBUG] [QUIC:] qlog: [12163547955908,"RECOVERY","RTT_UPDATE","PACKET_RX",{"zero_rtt":"successful"}]
+18:05:32.042 [DEBUG] [QUIC:] qlog: [12163547955911,"CONNECTIVITY","VERNEG","LINE",{"proposed_version":"Q035"}]
+18:05:32.042 [DEBUG] [QUIC:] qlog: [12163547955914,"CONNECTIVITY","VERNEG","LINE",{"proposed_version":"Q046"}]
+18:05:32.042 [DEBUG] [QUIC:] qlog: [12163547955917,"CONNECTIVITY","VERNEG","PACKET_RX",{"agreed_version":"Q044"}]
+18:05:32.042 [DEBUG] [QUIC:] qlog: [12163547955919,"CONNECTIVITY","VERNEG","PACKET_RX",{"agreed_version":"Q098"}]
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"qlog" end time: Feb 12 18:05 CST
+"qlog" time elapsed: 00:00:00
+----------------------------------------------------------
+
+32/63 Testing: quic_be_floats
+32/63 Test: quic_be_floats
+Command: "/home/liuwei/lsquic/tests/test_quic_be_floats"
+Directory: /home/liuwei/lsquic/tests
+"quic_be_floats" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"quic_be_floats" end time: Feb 12 18:05 CST
+"quic_be_floats" time elapsed: 00:00:00
+----------------------------------------------------------
+
+33/63 Testing: reg_pkt_headergen
+33/63 Test: reg_pkt_headergen
+Command: "/home/liuwei/lsquic/tests/test_reg_pkt_headergen"
+Directory: /home/liuwei/lsquic/tests
+"reg_pkt_headergen" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"reg_pkt_headergen" end time: Feb 12 18:05 CST
+"reg_pkt_headergen" time elapsed: 00:00:00
+----------------------------------------------------------
+
+34/63 Testing: rst_stream_gquic_be
+34/63 Test: rst_stream_gquic_be
+Command: "/home/liuwei/lsquic/tests/test_rst_stream_gquic_be"
+Directory: /home/liuwei/lsquic/tests
+"rst_stream_gquic_be" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"rst_stream_gquic_be" end time: Feb 12 18:05 CST
+"rst_stream_gquic_be" time elapsed: 00:00:00
+----------------------------------------------------------
+
+35/63 Testing: rtt
+35/63 Test: rtt
+Command: "/home/liuwei/lsquic/tests/test_rtt"
+Directory: /home/liuwei/lsquic/tests
+"rtt" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"rtt" end time: Feb 12 18:05 CST
+"rtt" time elapsed: 00:00:00
+----------------------------------------------------------
+
+36/63 Testing: send_headers
+36/63 Test: send_headers
+Command: "/home/liuwei/lsquic/tests/test_send_headers"
+Directory: /home/liuwei/lsquic/tests
+"send_headers" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"send_headers" end time: Feb 12 18:05 CST
+"send_headers" time elapsed: 00:00:00
+----------------------------------------------------------
+
+37/63 Testing: senhist
+37/63 Test: senhist
+Command: "/home/liuwei/lsquic/tests/test_senhist"
+Directory: /home/liuwei/lsquic/tests
+"senhist" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"senhist" end time: Feb 12 18:05 CST
+"senhist" time elapsed: 00:00:00
+----------------------------------------------------------
+
+38/63 Testing: set
+38/63 Test: set
+Command: "/home/liuwei/lsquic/tests/test_set"
+Directory: /home/liuwei/lsquic/tests
+"set" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"set" end time: Feb 12 18:05 CST
+"set" time elapsed: 00:00:00
+----------------------------------------------------------
+
+39/63 Testing: sfcw
+39/63 Test: sfcw
+Command: "/home/liuwei/lsquic/tests/test_sfcw"
+Directory: /home/liuwei/lsquic/tests
+"sfcw" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"sfcw" end time: Feb 12 18:05 CST
+"sfcw" time elapsed: 00:00:00
+----------------------------------------------------------
+
+40/63 Testing: shi
+40/63 Test: shi
+Command: "/home/liuwei/lsquic/tests/test_shi"
+Directory: /home/liuwei/lsquic/tests
+"shi" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   6.00 sec
+----------------------------------------------------------
+Test Passed.
+"shi" end time: Feb 12 18:05 CST
+"shi" time elapsed: 00:00:06
+----------------------------------------------------------
+
+41/63 Testing: spi
+41/63 Test: spi
+Command: "/home/liuwei/lsquic/tests/test_spi"
+Directory: /home/liuwei/lsquic/tests
+"spi" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+[DEBUG] [QUIC:] spi: test_same_priority: initialized; # elems: 4; sets: [ 0000000000000001, 0000000000000000, 0000000000000000, 0000000000000000 ]
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_first: return stream 0, priority 0
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_next: return stream 0, priority 0
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_next: return stream 0, priority 0
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_next: return stream 0, priority 0
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_first: return stream 0, priority 0
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_next: return stream 0, priority 0
+[DEBUG] [QUIC:] spi: test_same_priority: initialized; # elems: 4; sets: [ 0000000000000000, 0000000800000000, 0000000000000000, 0000000000000000 ]
+[DEBUG] [QUIC:] spi: test_same_priority: find_and_set_lowest_priority: prio 0 -> 99
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_first: return stream 0, priority 99
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_next: return stream 0, priority 99
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_next: return stream 0, priority 99
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_next: return stream 0, priority 99
+[DEBUG] [QUIC:] spi: test_same_priority: find_and_set_lowest_priority: prio 0 -> 99
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_first: return stream 0, priority 99
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_next: return stream 0, priority 99
+[DEBUG] [QUIC:] spi: test_same_priority: initialized; # elems: 4; sets: [ 0000000000000000, 0000000000000000, 0000000000000000, 8000000000000000 ]
+[DEBUG] [QUIC:] spi: test_same_priority: find_and_set_lowest_priority: prio 0 -> 255
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_first: return stream 0, priority 255
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_next: return stream 0, priority 255
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_next: return stream 0, priority 255
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_next: return stream 0, priority 255
+[DEBUG] [QUIC:] spi: test_same_priority: find_and_set_lowest_priority: prio 0 -> 255
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_first: return stream 0, priority 255
+[DEBUG] [QUIC:] spi: test_same_priority: lsquic_spi_next: return stream 0, priority 255
+[DEBUG] [QUIC:] spi: test_different_priorities: initialized; # elems: 7; sets: [ 00000000000000FE, 0000000000000000, 0000000000000000, 0000000000000000 ]
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_lowest_priority: prio 0 -> 1
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_first: return stream 0, priority 1
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 1 -> 2
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 2
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 2 -> 3
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 3
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 3 -> 4
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 4
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 4 -> 5
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 5
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 5 -> 6
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 6
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 6 -> 7
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 7
+[DEBUG] [QUIC:] spi: test_different_priorities: initialized; # elems: 7; sets: [ 00000000000000FE, 0000000000000000, 0000000000000000, 0000000000000000 ]
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_lowest_priority: prio 0 -> 1
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_first: return stream 0, priority 1
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 1 -> 2
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 2
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 2 -> 3
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 3
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 3 -> 4
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 4
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 4 -> 5
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 5
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 5 -> 6
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 6
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 6 -> 7
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 7
+[DEBUG] [QUIC:] spi: test_different_priorities: initialized; # elems: 12; sets: [ 0000000040900087, 0000003000010000, 0000000000000000, 8000000000000000 ]
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_first: return stream 0, priority 0
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 0
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 0 -> 1
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 1
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 1 -> 2
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 2
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 2 -> 7
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 7
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 7 -> 20
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 20
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 20 -> 23
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 23
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 23 -> 30
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 30
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 30 -> 80
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 80
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 80 -> 100
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 100
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 100 -> 101
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 101
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 101 -> 255
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 255
+[DEBUG] [QUIC:] spi: test_different_priorities: initialized; # elems: 6; sets: [ 0000000000000000, 0000000000000000, 0000000000000000, 0001000000000780 ]
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_lowest_priority: prio 0 -> 199
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_first: return stream 0, priority 199
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 199 -> 200
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 200
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 200
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 200 -> 201
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 201
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 201 -> 202
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 202
+[DEBUG] [QUIC:] spi: test_different_priorities: find_and_set_next_priority: prio 202 -> 240
+[DEBUG] [QUIC:] spi: test_different_priorities: lsquic_spi_next: return stream 0, priority 240
+[DEBUG] [QUIC:] spi: test_different_priorities_filter_odd: initialized; # elems: 4; sets: [ 0000000000000000, 0000000000000000, 0000000000000000, 0001000000000500 ]
+[DEBUG] [QUIC:] spi: test_different_priorities_filter_odd: find_and_set_lowest_priority: prio 0 -> 200
+[DEBUG] [QUIC:] spi: test_different_priorities_filter_odd: lsquic_spi_first: return stream 0, priority 200
+[DEBUG] [QUIC:] spi: test_different_priorities_filter_odd: lsquic_spi_next: return stream 0, priority 200
+[DEBUG] [QUIC:] spi: test_different_priorities_filter_odd: find_and_set_next_priority: prio 200 -> 202
+[DEBUG] [QUIC:] spi: test_different_priorities_filter_odd: lsquic_spi_next: return stream 0, priority 202
+[DEBUG] [QUIC:] spi: test_different_priorities_filter_odd: find_and_set_next_priority: prio 202 -> 240
+[DEBUG] [QUIC:] spi: test_different_priorities_filter_odd: lsquic_spi_next: return stream 0, priority 240
+[DEBUG] [QUIC:] spi: test_drop: initialized; # elems: 5; sets: [ 0000000000000003, 0000000000000000, 0000000000000000, 0000000000000100 ]
+[DEBUG] [QUIC:] spi: test_drop: find_and_set_lowest_priority: prio 0 -> 0
+[DEBUG] [QUIC:] spi: test_drop: lsquic_spi_next: return stream 5, priority 0
+[DEBUG] [QUIC:] spi: test_drop: initialized; # elems: 5; sets: [ 0000000000000003, 0000000000000000, 0000000000000000, 0000000000000100 ]
+[DEBUG] [QUIC:] spi: test_drop: find_and_set_lowest_priority: prio 0 -> 0
+[DEBUG] [QUIC:] spi: test_drop: find_and_set_lowest_priority: prio 0 -> 1
+[DEBUG] [QUIC:] spi: test_drop: lsquic_spi_first: return stream 7, priority 1
+[DEBUG] [QUIC:] spi: test_drop: find_and_set_next_priority: prio 1 -> 200
+[DEBUG] [QUIC:] spi: test_drop: lsquic_spi_next: return stream 127, priority 200
+[DEBUG] [QUIC:] spi: test_drop: initialized; # elems: 5; sets: [ 0000000000000013, 0000000000000000, 0000000000000000, 0000000000000100 ]
+[DEBUG] [QUIC:] spi: test_drop: find_and_set_lowest_priority: prio 0 -> 0
+[DEBUG] [QUIC:] spi: test_drop: find_and_set_lowest_priority: prio 1 -> 0
+[DEBUG] [QUIC:] spi: test_drop: initialized; # elems: 5; sets: [ 0000000000000013, 0000000000000000, 0000000000000000, 0000000000000100 ]
+[DEBUG] [QUIC:] spi: test_drop: find_and_set_lowest_priority: prio 0 -> 0
+[DEBUG] [QUIC:] spi: test_drop: find_and_set_lowest_priority: prio 1 -> 0
+[DEBUG] [QUIC:] spi: test_drop: find_and_set_lowest_priority: prio 0 -> 1
+[DEBUG] [QUIC:] spi: test_drop: lsquic_spi_first: return stream 7, priority 1
+[DEBUG] [QUIC:] spi: test_drop: find_and_set_next_priority: prio 1 -> 4
+[DEBUG] [QUIC:] spi: test_drop: lsquic_spi_next: return stream 5, priority 4
+[DEBUG] [QUIC:] spi: test_drop: find_and_set_next_priority: prio 4 -> 200
+[DEBUG] [QUIC:] spi: test_drop: lsquic_spi_next: return stream 127, priority 200
+[DEBUG] [QUIC:] spi: test_drop: lsquic_spi_first: return stream 0, priority 0
+[DEBUG] [QUIC:] spi: test_drop: lsquic_spi_first: return stream 0, priority 0
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"spi" end time: Feb 12 18:05 CST
+"spi" time elapsed: 00:00:00
+----------------------------------------------------------
+
+42/63 Testing: stop_waiting_gquic_be
+42/63 Test: stop_waiting_gquic_be
+Command: "/home/liuwei/lsquic/tests/test_stop_waiting_gquic_be"
+Directory: /home/liuwei/lsquic/tests
+"stop_waiting_gquic_be" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"stop_waiting_gquic_be" end time: Feb 12 18:05 CST
+"stop_waiting_gquic_be" time elapsed: 00:00:00
+----------------------------------------------------------
+
+43/63 Testing: streamgen
+43/63 Test: streamgen
+Command: "/home/liuwei/lsquic/tests/test_streamgen"
+Directory: /home/liuwei/lsquic/tests
+"streamgen" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"streamgen" end time: Feb 12 18:05 CST
+"streamgen" time elapsed: 00:00:00
+----------------------------------------------------------
+
+44/63 Testing: streamparse
+44/63 Test: streamparse
+Command: "/home/liuwei/lsquic/tests/test_streamparse"
+Directory: /home/liuwei/lsquic/tests
+"streamparse" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"streamparse" end time: Feb 12 18:05 CST
+"streamparse" time elapsed: 00:00:00
+----------------------------------------------------------
+
+45/63 Testing: tokgen
+45/63 Test: tokgen
+Command: "/home/liuwei/lsquic/tests/test_tokgen"
+Directory: /home/liuwei/lsquic/tests
+"tokgen" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+B6C1D5AD97A78E551A29835FAB4E725C
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"tokgen" end time: Feb 12 18:05 CST
+"tokgen" time elapsed: 00:00:00
+----------------------------------------------------------
+
+46/63 Testing: trapa
+46/63 Test: trapa
+Command: "/home/liuwei/lsquic/tests/test_trapa"
+Directory: /home/liuwei/lsquic/tests
+"trapa" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"trapa" end time: Feb 12 18:05 CST
+"trapa" time elapsed: 00:00:00
+----------------------------------------------------------
+
+47/63 Testing: varint
+47/63 Test: varint
+Command: "/home/liuwei/lsquic/tests/test_varint"
+Directory: /home/liuwei/lsquic/tests
+"varint" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"varint" end time: Feb 12 18:05 CST
+"varint" time elapsed: 00:00:00
+----------------------------------------------------------
+
+48/63 Testing: ver_nego
+48/63 Test: ver_nego
+Command: "/home/liuwei/lsquic/tests/test_ver_nego"
+Directory: /home/liuwei/lsquic/tests
+"ver_nego" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ver_nego" end time: Feb 12 18:05 CST
+"ver_nego" time elapsed: 00:00:00
+----------------------------------------------------------
+
+49/63 Testing: wuf_gquic_be
+49/63 Test: wuf_gquic_be
+Command: "/home/liuwei/lsquic/tests/test_wuf_gquic_be"
+Directory: /home/liuwei/lsquic/tests
+"wuf_gquic_be" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"wuf_gquic_be" end time: Feb 12 18:05 CST
+"wuf_gquic_be" time elapsed: 00:00:00
+----------------------------------------------------------
+
+50/63 Testing: frame_rw
+50/63 Test: frame_rw
+Command: "/home/liuwei/lsquic/tests/test_frame_rw"
+Directory: /home/liuwei/lsquic/tests
+"frame_rw" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   2.26 sec
+----------------------------------------------------------
+Test Passed.
+"frame_rw" end time: Feb 12 18:05 CST
+"frame_rw" time elapsed: 00:00:02
+----------------------------------------------------------
+
+51/63 Testing: ack_merge
+51/63 Test: ack_merge
+Command: "/home/liuwei/lsquic/tests/test_ack_merge"
+Directory: /home/liuwei/lsquic/tests
+"ack_merge" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ack_merge" end time: Feb 12 18:05 CST
+"ack_merge" time elapsed: 00:00:00
+----------------------------------------------------------
+
+52/63 Testing: hcsi_reader
+52/63 Test: hcsi_reader
+Command: "/home/liuwei/lsquic/tests/test_hcsi_reader"
+Directory: /home/liuwei/lsquic/tests
+"hcsi_reader" start time: Feb 12 18:05 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"hcsi_reader" end time: Feb 12 18:05 CST
+"hcsi_reader" time elapsed: 00:00:00
+----------------------------------------------------------
+
