@@ -513,15 +513,18 @@ http_client_on_new_stream (void *stream_if_ctx, lsquic_stream_t *stream)
     st_h->sh_created = lsquic_time_now();
     if (st_h->client_ctx->hcc_cur_pe)
     {
+        LSQ_INFO("now client hcc_cur is %s", st_h->client_ctx->hcc_cur_pe->path);
         st_h->client_ctx->hcc_cur_pe = TAILQ_NEXT(
                                         st_h->client_ctx->hcc_cur_pe, next_pe);
         if (!st_h->client_ctx->hcc_cur_pe)  /* Wrap around */
             st_h->client_ctx->hcc_cur_pe =
                                 TAILQ_FIRST(&st_h->client_ctx->hcc_path_elems);
+        LSQ_INFO("after client hcc_cur is %s", st_h->client_ctx->hcc_cur_pe->path);
     }
     else
         st_h->client_ctx->hcc_cur_pe = TAILQ_FIRST(
                                             &st_h->client_ctx->hcc_path_elems);
+    LSQ_INFO("finally client hcc_cur is %s", st_h->client_ctx->hcc_cur_pe->path);
     st_h->path = st_h->client_ctx->hcc_cur_pe->path;
     if (st_h->client_ctx->payload)
     {
@@ -1602,6 +1605,7 @@ main (int argc, char **argv)
     struct http_client_ctx client_ctx;
     struct stat st;
     struct path_elem *pe;
+    char *pstring;
     struct sport_head sports;
     struct prog prog;
     const char *token = NULL;
@@ -1695,9 +1699,20 @@ main (int argc, char **argv)
             prog.prog_hostname = optarg;            /* Pokes into prog */
             break;
         case 'p':
-            pe = calloc(1, sizeof(*pe));
-            pe->path = optarg;
-            TAILQ_INSERT_TAIL(&client_ctx.hcc_path_elems, pe, next_pe);
+            pstring = strtok(optarg, ",");
+            while (pstring != NULL)
+            {
+                pe = calloc(1, sizeof(*pe));
+                pe->path = pstring;
+                fprintf(stdout, "path add %s\n", pstring);
+                TAILQ_INSERT_TAIL(&client_ctx.hcc_path_elems, pe, next_pe);
+                pstring = strtok(NULL, ",");
+            }
+            // pe = calloc(1, sizeof(*pe));
+            // pe->path = optarg;
+            // TAILQ_INSERT_TAIL(&client_ctx.hcc_path_elems, pe, next_pe);
+            // LSQ_INFO("add path %s ", optarg);
+            // printf("add path %s ", optarg);
             break;
         case 'h':
             usage(argv[0]);
@@ -1827,7 +1842,6 @@ main (int argc, char **argv)
         fprintf(stderr, "Specify at least one path using -p option\n");
         exit(1);
     }
-
     start_time = lsquic_time_now();
     was_empty = TAILQ_EMPTY(&sports);
     if (0 != prog_prep(&prog))

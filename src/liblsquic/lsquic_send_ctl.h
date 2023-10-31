@@ -10,7 +10,10 @@
 #   define LSQUIC_SEND_STATS 1
 #endif
 
+#define MAX_ROUND_BOUND  20
+
 TAILQ_HEAD(lsquic_packets_tailq, lsquic_packet_out);
+TAILQ_HEAD(lsquic_feedback_tailq, lsquic_art_feedback);
 
 struct lsquic_packet_out;
 struct ack_info;
@@ -21,6 +24,7 @@ struct network_path;
 struct ver_neg;
 enum pns;
 struct to_coal;
+struct lsquic_art_feedback;
 
 enum buf_packet_type { BPT_HIGHEST_PRIO, BPT_OTHER_PRIO, };
 
@@ -75,8 +79,15 @@ typedef struct lsquic_send_ctl {
     lsquic_time_t                   sc_last_rto_time;
     lsquic_time_t                   sc_remained_min_rtt_time;
     unsigned                        sc_remained_dup_num;
+    unsigned                        sc_lost_packet_number;
+    unsigned                        sc_largest_feedbback_window;
+    unsigned                        sc_feedback_window_size;
+    unsigned                        sc_rounds_map[MAX_ROUND_BOUND];
+    unsigned long                   sc_all_retrans_packet_num;
     struct lsquic_packet_out       *sc_pre_dup_packet;
-    unsigned                        sc_or3_flag;
+    unsigned                        sc_art_flag;
+    uint64_t                        sc_send_rate,
+                                    sc_ack_rate;
     int                           (*sc_can_send)(struct lsquic_send_ctl *);
     unsigned                        sc_bytes_unacked_retx;
     unsigned                        sc_bytes_scheduled;
@@ -97,6 +108,7 @@ typedef struct lsquic_send_ctl {
     struct lsquic_packets_tailq     sc_scheduled_packets,
                                     sc_0rtt_stash,
                                     sc_lost_packets;
+    struct lsquic_feedback_tailq    sc_feedback_window;
     struct lsquic_packets_tailq     sc_duplicate_packets;
     struct buf_packet_q             sc_buffered_packets[BPT_OTHER_PRIO + 1];
     const struct ver_neg           *sc_ver_neg;
@@ -469,5 +481,8 @@ lsquic_send_ctl_stash_0rtt_packets (struct lsquic_send_ctl *);
 
 struct lsquic_packet_out*
 lsquic_send_ctl_copy_packet_out (struct lsquic_send_ctl *ctl, struct lsquic_packet_out *, unsigned take_pno, unsigned retrans_times);
+
+static void
+output_network_status(lsquic_send_ctl_t *ctl);
 
 #endif

@@ -51,7 +51,8 @@ const char *const lsquic_alid2str[] =
     [AL_BLOCKED_KA] = "BLOCKED_KA",
     [AL_MTU_PROBE]  = "MTU_PROBE",
     [AL_PACK_TOL]   = "PACK_TOL",
-    [AL_OR3_SCHE]   = "OR3_SCHE",
+    [AL_ART_SCHE]   = "ART_SCHE",
+    [AL_DEBUG_STATUS] = "DEBUG_STATUS"
 };
 
 

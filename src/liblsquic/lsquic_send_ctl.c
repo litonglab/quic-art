@@ -52,6 +52,7 @@
 #include "lsquic_frab_list.h"
 #include "lsquic_qdec_hdl.h"
 #include "lsquic_crand.h"
+#include "lsquic_art_feedback.h"
 
 #define LSQUIC_LOGGER_MODULE LSQLM_SENDCTL
 #define LSQUIC_LOG_CONN_ID lsquic_conn_log_cid(ctl->sc_conn_pub->lconn)
@@ -138,7 +139,10 @@ static int
 split_lost_packet (struct lsquic_send_ctl *, struct lsquic_packet_out *const);
 
 static void
-or3_schedule(enum alarm_id al_id, void *ctx, lsquic_time_t expiry, lsquic_time_t now);
+art_schedule(enum alarm_id al_id, void *ctx, lsquic_time_t expiry, lsquic_time_t now);
+
+static void
+debug_network(enum alarm_id al_id, void *ctx, lsquic_time_t expiry, lsquic_time_t now);
 
 #ifdef NDEBUG
 static
@@ -357,6 +361,7 @@ lsquic_send_ctl_init (lsquic_send_ctl_t *ctl, struct lsquic_alarmset *alset,
     TAILQ_INIT(&ctl->sc_lost_packets);
     TAILQ_INIT(&ctl->sc_duplicate_packets);
     TAILQ_INIT(&ctl->sc_0rtt_stash);
+    TAILQ_INIT(&ctl->sc_feedback_window);
     ctl->sc_enpub = enpub;
     ctl->sc_alset = alset;
     ctl->sc_ver_neg = ver_neg;
@@ -364,10 +369,18 @@ lsquic_send_ctl_init (lsquic_send_ctl_t *ctl, struct lsquic_alarmset *alset,
     ctl->sc_remained_min_rtt_time = 0;
     ctl->sc_remained_dup_num = 0;
     ctl->sc_pre_dup_packet = NULL;
-    // 1 means run or3, 0 means not
-    ctl->sc_or3_flag = 0;
+    // 1 means run art, 0 means not
+    ctl->sc_art_flag = 1;
+    ctl->sc_all_retrans_packet_num = 0;
+    ctl->sc_largest_feedbback_window = 10;
+    ctl->sc_feedback_window_size = 0;
+    ctl->sc_send_rate = 0;
+    ctl->sc_ack_rate = 0;
+    ctl->sc_lost_packet_number = 0;
     assert(!(flags & ~(SC_IETF|SC_NSTP|SC_ECN)));
     ctl->sc_flags = flags;
+    for(unsigned temp = 0; temp < MAX_ROUND_BOUND; temp++)
+        ctl->sc_rounds_map[temp] = 2*temp - 1;
     send_ctl_pick_initial_packno(ctl);
     if (enpub->enp_settings.es_pace_packets)
         ctl->sc_flags |= SC_PACE;
@@ -382,7 +395,8 @@ lsquic_send_ctl_init (lsquic_send_ctl_t *ctl, struct lsquic_alarmset *alset,
     lsquic_alarmset_init_alarm(alset, AL_RETX_INIT, retx_alarm_rings, ctl);
     lsquic_alarmset_init_alarm(alset, AL_RETX_HSK, retx_alarm_rings, ctl);
     lsquic_alarmset_init_alarm(alset, AL_RETX_APP, retx_alarm_rings, ctl);
-    lsquic_alarmset_init_alarm(alset, AL_OR3_SCHE, or3_schedule, ctl);
+    lsquic_alarmset_init_alarm(alset, AL_ART_SCHE, art_schedule, ctl);
+    lsquic_alarmset_init_alarm(alset, AL_DEBUG_STATUS, debug_network, ctl);
     lsquic_senhist_init(&ctl->sc_senhist, ctl->sc_flags & SC_IETF);
 #ifndef NDEBUG
     /* TODO: the logic to select the "previously sent" packno should not be
@@ -428,6 +442,7 @@ lsquic_send_ctl_init (lsquic_send_ctl_t *ctl, struct lsquic_alarmset *alset,
     else
         ctl->sc_can_send = send_ctl_can_send;
     ctl->sc_reord_thresh = N_NACKS_BEFORE_RETX;
+    lsquic_alarmset_set(ctl->sc_alset, AL_DEBUG_STATUS, lsquic_time_now() + 100000);
 #if LSQUIC_DEVEL
     const char *s;
     s = getenv("LSQUIC_DYN_PTHRESH");
@@ -575,6 +590,7 @@ send_ctl_unacked_append (struct lsquic_send_ctl *ctl,
     packet_out->po_flags |= PO_UNACKED;
     ctl->sc_bytes_unacked_all += packet_out_sent_sz(packet_out);
     ctl->sc_n_in_flight_all  += 1;
+    LSQ_DEBUG("unacked queue append packet %"PRIu64" in pns %u, now inflight is %u", packet_out->po_packno, pns, ctl->sc_n_in_flight_all);
     if (packet_out->po_frame_types & ctl->sc_retx_frames)
     {
         ctl->sc_bytes_unacked_retx += packet_out_total_sz(packet_out);
@@ -592,6 +608,7 @@ send_ctl_unacked_remove (struct lsquic_send_ctl *ctl,
     pns = lsquic_packet_out_pns(packet_out);
     TAILQ_REMOVE(&ctl->sc_unacked_packets[pns], packet_out, po_next);
     packet_out->po_flags &= ~PO_UNACKED;
+    LSQ_DEBUG("unacked queue remove packet %"PRIu64" in pns %u, now inflight is %u", packet_out->po_packno, pns, ctl->sc_n_in_flight_all);
     assert(ctl->sc_bytes_unacked_all >= packet_sz);
     ctl->sc_bytes_unacked_all -= packet_sz;
     ctl->sc_n_in_flight_all  -= 1;
@@ -600,7 +617,6 @@ send_ctl_unacked_remove (struct lsquic_send_ctl *ctl,
         ctl->sc_bytes_unacked_retx -= packet_sz;
         --ctl->sc_n_in_flight_retx;
     }
-    LSQ_DEBUG("unacked queue remove %"PRIu64, packet_out->po_packno);
 }
 
 static void
@@ -768,6 +784,10 @@ lsquic_send_ctl_sent_packet (lsquic_send_ctl_t *ctl,
         if (ctl->sc_n_in_flight_retx == 1)
             ctl->sc_flags |= SC_WAS_QUIET;
     }
+    if (packet_out->po_bwp_state && (packet_out->po_sent - packet_out->po_bwp_state->bwps_last_ack_sent_time))
+        ctl->sc_send_rate =  BW_FROM_BYTES_AND_DELTA(packet_out->po_bwp_state->bwps_send_state.total_bytes_sent
+                                    - packet_out->po_bwp_state->bwps_sent_at_last_ack,
+                packet_out->po_sent - packet_out->po_bwp_state->bwps_last_ack_sent_time).value;
     /* TODO: Do we really want to use those for RTT info? Revisit this. */
     /* Hold on to packets that are not retransmittable because we need them
      * to sample RTT information.  They are released when ACK is received.
@@ -910,7 +930,17 @@ send_ctl_destroy_chain (struct lsquic_send_ctl *ctl,
             break;
         case PO_UNACKED:
             if (chain_cur->po_flags & PO_LOSS_REC)
+            {
+                if (chain_cur->po_fake_loss_rec == 1)
+                {
+                    ctl->sc_n_in_flight_all -= 1;
+                    ctl->sc_bytes_unacked_all -= chain_cur->po_sent_sz;
+                    if (chain_cur->po_bwp_state)
+                        lsquic_malo_put(chain_cur->po_bwp_state);
+                    LSQ_DEBUG("unacked queue remove fake loss_record packet %"PRIu64", inflight is %u, unacked bytes %u", chain_cur->po_packno, ctl->sc_n_in_flight_all, ctl->sc_bytes_unacked_all);
+                }
                 TAILQ_REMOVE(&ctl->sc_unacked_packets[pns], chain_cur, po_next);
+            }
             else
             {
                 packet_sz = packet_out_sent_sz(chain_cur);
@@ -919,6 +949,7 @@ send_ctl_destroy_chain (struct lsquic_send_ctl *ctl,
             break;
         case PO_LOST:
             TAILQ_REMOVE(&ctl->sc_lost_packets, chain_cur, po_next);
+            ctl->sc_lost_packet_number--;
             break;
         case 0:
             /* This is also weird, but let it pass */
@@ -951,7 +982,6 @@ send_ctl_record_loss (struct lsquic_send_ctl *ctl,
     loss_record = lsquic_malo_get(ctl->sc_conn_pub->packet_out_malo);
     if (loss_record)
     {
-        LSQ_DEBUG("copy loss_record start");
         memset(loss_record, 0, sizeof(*loss_record));
         loss_record->po_flags = PO_UNACKED|PO_LOSS_REC|PO_SENT_SZ;
         loss_record->po_flags |=
@@ -961,6 +991,7 @@ send_ctl_record_loss (struct lsquic_send_ctl *ctl,
         loss_record->po_retrans_no = packet_out->po_retrans_no;
         loss_record->po_retrans_packet_number = packet_out->po_retrans_packet_number;
         loss_record->po_fake_loss_rec = packet_out->po_fake_loss_rec;
+        loss_record->po_been_detect_loss = packet_out->po_been_detect_loss;
         loss_record->po_retrans_times = packet_out->po_retrans_times;
         loss_record->po_sent = packet_out->po_sent;
         loss_record->po_sent_sz = packet_out_sent_sz(packet_out);
@@ -972,7 +1003,15 @@ send_ctl_record_loss (struct lsquic_send_ctl *ctl,
          * remove from the list:
          */
         TAILQ_INSERT_BEFORE(packet_out, loss_record, po_next);
-        LSQ_DEBUG("copy loss_record finished");
+        // fake loss_record need to record in in_flight
+        if (loss_record->po_fake_loss_rec == 1)
+        {
+            ctl->sc_n_in_flight_all += 1;
+            ctl->sc_bytes_unacked_all += packet_out_sent_sz(packet_out);
+            loss_record->po_bwp_state = packet_out->po_bwp_state;
+            packet_out->po_bwp_state = NULL;
+            LSQ_DEBUG("unacked queue add fake loss_record packet %"PRIu64", inflight is %u, unacked bytes %u", packet_out->po_packno, ctl->sc_n_in_flight_all, ctl->sc_bytes_unacked_all);
+        }
         return loss_record;
     }
     else
@@ -988,38 +1027,39 @@ send_ctl_handle_regular_lost_packet (struct lsquic_send_ctl *ctl,
             lsquic_packet_out_t *packet_out, struct lsquic_packet_out **next)
 {
     struct lsquic_packet_out *loss_record;
-    lsquic_packet_out_t *new_packet_out = NULL;
+    lsquic_packet_out_t *new_packet_out = NULL, *temp_packet_out = NULL;
     unsigned packet_sz;
+    lsquic_time_t now, delay;
 
     assert(ctl->sc_n_in_flight_all);
     packet_sz = packet_out_sent_sz(packet_out);
 
-    ++ctl->sc_loss_count;
-#if LSQUIC_CONN_STATS
-    ++ctl->sc_conn_pub->conn_stats->out.lost_packets;
-#endif
-
-    if (packet_out->po_frame_types & (1 << QUIC_FRAME_ACK))
+    if (!packet_out->po_fake_loss_rec || (packet_out->po_fake_loss_rec && (packet_out->po_retrans_packet_number >= packet_out->po_need_retrans_number)))
+    //if (!packet_out->po_fake_loss_rec || (packet_out->po_flags & PO_LOSS_REC))
     {
-        ctl->sc_flags |= SC_LOST_ACK_INIT << lsquic_packet_out_pns(packet_out);
-        LSQ_DEBUG("lost ACK in packet %"PRIu64, packet_out->po_packno);
-    }
+        ++ctl->sc_loss_count;
+    #if LSQUIC_CONN_STATS
+        ++ctl->sc_conn_pub->conn_stats->out.lost_packets;
+    #endif
 
-    if (!packet_out->po_fake_loss_rec || (packet_out->po_flags & PO_LOSS_REC))
-    {
+        if (packet_out->po_frame_types & (1 << QUIC_FRAME_ACK))
+        {
+            ctl->sc_flags |= SC_LOST_ACK_INIT << lsquic_packet_out_pns(packet_out);
+            LSQ_DEBUG("lost ACK in packet %"PRIu64, packet_out->po_packno);
+        }
         // retransmit several duplicate in one turn
         if (ctl->sc_ci->cci_lost)
             ctl->sc_ci->cci_lost(CGP(ctl), packet_out, packet_sz);
-    }
 
-    /* This is a client-only check, server check happens in mini conn */
-    if (lsquic_send_ctl_ecn_turned_on(ctl)
-            && 0 == ctl->sc_ecn_total_acked[PNS_INIT]
-                && HETY_INITIAL == packet_out->po_header_type
-                    && 3 == packet_out->po_packno)
-    {
-        LSQ_DEBUG("possible ECN black hole during handshake, disable ECN");
-        lsquic_send_ctl_disable_ecn(ctl);
+        /* This is a client-only check, server check happens in mini conn */
+        if (lsquic_send_ctl_ecn_turned_on(ctl)
+                && 0 == ctl->sc_ecn_total_acked[PNS_INIT]
+                    && HETY_INITIAL == packet_out->po_header_type
+                        && 3 == packet_out->po_packno)
+        {
+            LSQ_DEBUG("possible ECN black hole during handshake, disable ECN");
+            lsquic_send_ctl_disable_ecn(ctl);
+        }
     }
 
     if (packet_out->po_frame_types & ctl->sc_retx_frames)
@@ -1028,22 +1068,28 @@ send_ctl_handle_regular_lost_packet (struct lsquic_send_ctl *ctl,
                                                     packet_out->po_packno);
         if (packet_out->po_flags & PO_LOSS_REC)
         {
+            LSQ_DEBUG("unacked queue remove fake loss_record packet %"PRIu64" lost again, its fake_loss is %u", packet_out->po_packno, packet_out->po_fake_loss_rec);
+            ctl->sc_n_in_flight_all -= 1;
+            ctl->sc_bytes_unacked_all -= packet_out->po_sent_sz;
+            packet_out->po_fake_loss_rec = 0;
             struct lsquic_packet_out *chain_cur, *chain_next;
             for (chain_cur = packet_out->po_loss_chain; chain_cur != packet_out;
                                                             chain_cur = chain_next)
             {
-                // if (chain_cur->po_retrans_no != 0)
-                // {
-                //     LSQ_DEBUG("origin packet %"PRIu64" copy chain has packet %"PRIu64", its type is %u", chain_cur->po_retrans_no, chain_cur->po_packno, chain_cur->po_flags);
-                // }
                 chain_next = chain_cur->po_loss_chain;
                 if (0 == (chain_cur->po_flags & PO_LOSS_REC))
                 {
                     new_packet_out = chain_cur;
+                    if (0==(new_packet_out->po_flags & PO_LOST))
+                        loss_record = send_ctl_record_loss(ctl, new_packet_out);
+                    else
+                        loss_record = packet_out;
                     new_packet_out->po_retrans_times = packet_out->po_retrans_times;
+                    new_packet_out->po_retrans_packet_number = 0;
                     new_packet_out->po_fake_loss_rec = 0;
+                    new_packet_out->po_been_detect_loss = 1;
                     new_packet_out->po_retrans_no = packet_out->po_retrans_no;
-                    LSQ_DEBUG("origin loss_record %"PRIu64" map to packet %"PRIu64", its type is %u", packet_out->po_packno, new_packet_out->po_packno, chain_cur->po_flags);
+                    LSQ_DEBUG("origin loss_record %"PRIu64" map to packet %"PRIu64", its type is %u, its fake_loss is %u", packet_out->po_packno, new_packet_out->po_packno, chain_cur->po_flags, packet_out->po_fake_loss_rec);
                     break;
                 }
             }
@@ -1052,31 +1098,47 @@ send_ctl_handle_regular_lost_packet (struct lsquic_send_ctl *ctl,
                 LSQ_DEBUG("loss_record don't have data packet, why?");
                 assert(0);
             }
+            // fix bug
             packet_out = new_packet_out;
         }
-        loss_record = send_ctl_record_loss(ctl, packet_out);
-        send_ctl_unacked_remove(ctl, packet_out, packet_sz);
-        TAILQ_INSERT_TAIL(&ctl->sc_lost_packets, packet_out, po_next);
-        packet_out->po_flags |= PO_LOST;
+        else
+            loss_record = send_ctl_record_loss(ctl, packet_out);
+        if (0==(packet_out->po_flags & PO_LOST))
+        {
+            send_ctl_unacked_remove(ctl, packet_out, packet_sz);
+            TAILQ_INSERT_TAIL(&ctl->sc_lost_packets, packet_out, po_next);
+            // TAILQ_INSERT_HEAD(&ctl->sc_lost_packets, packet_out, po_next);
+            ctl->sc_lost_packet_number++;
+            packet_out->po_flags |= PO_LOST;
+        }
+        else
+            LSQ_DEBUG("packet %"PRIu64" was retransmitted again before finished!", packet_out->po_packno);
         if((packet_out->po_frame_types != QUIC_FTBIT_PADDING) && (packet_out->po_frame_types & (1 << QUIC_FRAME_STREAM)))
         {
-            if (packet_out->po_fake_loss_rec && !(packet_out->po_flags & PO_LOSS_REC))
+            if (packet_out->po_fake_loss_rec && !(packet_out->po_flags & PO_LOSS_REC) && !packet_out->po_been_detect_loss)
             {
                 // retransmit several duplicate in one turn
                 packet_out->po_retrans_packet_number += 1;
-                ;// TODO
+                delay = lsquic_packet_out_schedule_time(packet_out, 0, lsquic_time_now());
+                LSQ_DEBUG("packet %"PRIu64" will be sent after %"PRIu64" microseconds delay. time_left %d, expect_sent is %"PRIu64", now is %"PRIu64, packet_out->po_packno, delay, (packet_out->po_remained_time - (lsquic_time_now() - packet_out->po_last_lost_time)), packet_out->po_expected_sent, lsquic_time_now());
             }
             else
             {
+                if (packet_out->po_fake_loss_rec && (packet_out->po_retrans_packet_number < packet_out->po_need_retrans_number))
+                    LSQ_DEBUG("packet %"PRIu64" duplicate is retransmitted again before retransmit finish. Original packet_no is: %"PRIu64, packet_out->po_packno, packet_out->po_retrans_no);
                 packet_out->po_retrans_times += 1;
                 packet_out->po_retrans_no = packet_out->po_retrans_no ? packet_out->po_retrans_no : packet_out->po_packno;
-                if (ctl->sc_or3_flag)
+                packet_out->po_remained_time = lsquic_rtt_stats_get_min_rtt(&ctl->sc_conn_pub->rtt_stats);
+                if (ctl->sc_art_flag)
                 {
-                    packet_out->po_need_retrans_number = lsquic_packet_out_duplicate_number(packet_out);
+                    unsigned dup_number = art_duplicate_number(ctl, packet_out);
+                    packet_out->po_need_retrans_number = dup_number > 0 ? dup_number : 1;
                     packet_out->po_fake_loss_rec = 1;
+                    delay = lsquic_packet_out_schedule_time(packet_out, 1, lsquic_time_now());
+                    LSQ_DEBUG("packet %"PRIu64" will be sent after %"PRIu64" microseconds delay. time_left %d, expect_sent is %"PRIu64", now is %"PRIu64, packet_out->po_packno, delay, (packet_out->po_remained_time - (lsquic_time_now() - packet_out->po_last_lost_time)), packet_out->po_expected_sent, lsquic_time_now());
                 }
-
             }
+            packet_out->po_been_detect_loss = 0;
         }
         return loss_record;
     }
@@ -1148,6 +1210,29 @@ send_ctl_loss_event (struct lsquic_send_ctl *ctl)
 }
 
 
+static void
+send_ctl_record_feedback_loss(struct lsquic_send_ctl *ctl)
+{
+    struct lsquic_art_feedback *temp_feedback;
+
+    if (ctl->sc_feedback_window_size >= ctl->sc_largest_feedbback_window)
+    {
+        temp_feedback = TAILQ_FIRST(&ctl->sc_feedback_window);
+        TAILQ_REMOVE(&ctl->sc_feedback_window, temp_feedback, af_next);
+    }
+    else
+    {
+        temp_feedback = lsquic_malo_get(ctl->sc_conn_pub->packet_out_malo);
+        if (temp_feedback)
+        {
+            memset(temp_feedback, 0, sizeof(*temp_feedback));
+            ctl->sc_feedback_window_size += 1;
+        }
+    }
+    temp_feedback->feedback_value = 1;
+    TAILQ_INSERT_TAIL(&ctl->sc_feedback_window, temp_feedback, af_next);
+}
+
 /* Return true if losses were detected, false otherwise */
 static int
 send_ctl_detect_losses (struct lsquic_send_ctl *ctl, enum packnum_space pns,
@@ -1166,22 +1251,42 @@ send_ctl_detect_losses (struct lsquic_send_ctl *ctl, enum packnum_space pns,
     {
         next = TAILQ_NEXT(packet_out, po_next);
 
-        if (!packet_out->po_fake_loss_rec && (packet_out->po_flags & (PO_LOSS_REC|PO_POISON)))
+        // ignore duplicate loss, only check last packet
+        if ((packet_out->po_flags & (PO_POISON)))
+        //if (!packet_out->po_need_detect_loss && (packet_out->po_flags & (PO_LOSS_REC|PO_POISON)))
             continue;
-
+        // ignore last duplicate packet, it is not loss_record 
+        // if (packet_out->po_fake_loss_rec && (packet_out->po_retrans_packet_number >= packet_out->po_need_retrans_number) && 0 == (packet_out->po_flags & (PO_LOSS_REC)))
+        //     continue;
+        
         if (packet_out->po_packno + ctl->sc_reord_thresh <
                                                 ctl->sc_largest_acked_packno)
         {
-            LSQ_DEBUG("loss by FACK detected (dist: %"PRIu64"), loss_record is %u, packet %"PRIu64,
+            LSQ_DEBUG("loss by FACK detected (dist: %"PRIu64"), loss_record is %u, packet %"PRIu64", fake %u, retrans %u, need_retrans %u, retrans>need: %d",
                 ctl->sc_largest_acked_packno - packet_out->po_packno, packet_out->po_flags&PO_LOSS_REC,
-                                                    packet_out->po_packno);
+                                                    packet_out->po_packno, packet_out->po_fake_loss_rec, packet_out->po_retrans_packet_number, packet_out->po_need_retrans_number,
+                                                    (packet_out->po_retrans_packet_number >= packet_out->po_need_retrans_number));
+            if (packet_out->po_flags & PO_LOSS_REC)
+            {
+                if ((packet_out->po_fake_loss_rec == 1) && (packet_out->po_feedback_recorded == 0))
+                {
+                    send_ctl_record_feedback_loss(ctl);
+                    packet_out->po_feedback_recorded = 1;
+                }
+                continue;
+            }
             if (0 == (packet_out->po_flags & PO_MTU_PROBE))
             {
                 largest_lost_packno = packet_out->po_packno;
-                loss_record = send_ctl_handle_regular_lost_packet(ctl,
-                                                        packet_out, &next);
-                if (loss_record)
-                    loss_record->po_lflags |= POL_FACKED;
+                if ((0 == (packet_out->po_flags & PO_LOST)) && (!packet_out->po_fake_loss_rec || (packet_out->po_fake_loss_rec && (packet_out->po_retrans_packet_number >= packet_out->po_need_retrans_number))))
+                {
+                    // only work one time
+                    packet_out->po_been_detect_loss = 1;
+                    loss_record = send_ctl_handle_regular_lost_packet(ctl,
+                                                            packet_out, &next);
+                    if (loss_record)
+                        loss_record->po_lflags |= POL_FACKED;
+                }
             }
             else
                 send_ctl_handle_lost_mtu_probe(ctl, packet_out);
@@ -1195,12 +1300,26 @@ send_ctl_detect_losses (struct lsquic_send_ctl *ctl, enum packnum_space pns,
         {
             LSQ_DEBUG("loss by early retransmit detected, packet %"PRIu64,
                                                     packet_out->po_packno);
+            if (packet_out->po_flags & PO_LOSS_REC)
+            {
+                if ((packet_out->po_fake_loss_rec == 1) && (packet_out->po_feedback_recorded == 0))
+                {
+                    send_ctl_record_feedback_loss(ctl);
+                    packet_out->po_feedback_recorded = 1;
+                }
+                continue;
+            }
             largest_lost_packno = packet_out->po_packno;
             ctl->sc_loss_to =
                 lsquic_rtt_stats_get_srtt(&ctl->sc_conn_pub->rtt_stats) / 4;
             LSQ_DEBUG("set sc_loss_to to %"PRIu64", packet %"PRIu64,
                                     ctl->sc_loss_to, packet_out->po_packno);
-            (void) send_ctl_handle_lost_packet(ctl, packet_out, &next);
+            if ((0 == (packet_out->po_flags & PO_LOST)) && (!packet_out->po_fake_loss_rec || (packet_out->po_fake_loss_rec && (packet_out->po_retrans_packet_number >= packet_out->po_need_retrans_number))))
+            {
+                // only work one time
+                packet_out->po_been_detect_loss = 1;
+                (void) send_ctl_handle_lost_packet(ctl, packet_out, &next);
+            }
             continue;
         }
 
@@ -1209,11 +1328,25 @@ send_ctl_detect_losses (struct lsquic_send_ctl *ctl, enum packnum_space pns,
         {
             LSQ_DEBUG("loss by sent time detected: packet %"PRIu64,
                                                     packet_out->po_packno);
+            if (packet_out->po_flags & PO_LOSS_REC)
+            {
+                if ((packet_out->po_fake_loss_rec == 1) && (packet_out->po_feedback_recorded == 0))
+                {
+                    send_ctl_record_feedback_loss(ctl);
+                    packet_out->po_feedback_recorded = 1;
+                }
+                continue;
+            }
             if ((packet_out->po_frame_types & ctl->sc_retx_frames)
                             && 0 == (packet_out->po_flags & PO_MTU_PROBE))
                 largest_lost_packno = packet_out->po_packno;
             else { /* don't count it as a loss */; }
-            (void) send_ctl_handle_lost_packet(ctl, packet_out, &next);
+            if ((0 == (packet_out->po_flags & PO_LOST)) && (!packet_out->po_fake_loss_rec || (packet_out->po_fake_loss_rec && (packet_out->po_retrans_packet_number >= packet_out->po_need_retrans_number))))
+            {
+                // only work one time
+                packet_out->po_been_detect_loss = 1;
+                (void) send_ctl_handle_lost_packet(ctl, packet_out, &next);
+            }
             continue;
         }
     }
@@ -1277,7 +1410,7 @@ lsquic_send_ctl_got_ack (lsquic_send_ctl_t *ctl,
 {
     const struct lsquic_packno_range *range =
                                     &acki->ranges[ acki->n_ranges - 1 ];
-    lsquic_packet_out_t *packet_out, *next;
+    lsquic_packet_out_t *packet_out, *next, *latest_sent_packet;
     lsquic_packno_t smallest_unacked;
     lsquic_packno_t prev_largest_acked;
     lsquic_packno_t ack2ed[2];
@@ -1286,6 +1419,7 @@ lsquic_send_ctl_got_ack (lsquic_send_ctl_t *ctl,
     signed char do_rtt, skip_checks;
     enum packnum_space pns;
     unsigned ecn_total_acked, ecn_ce_cnt, one_rtt_cnt;
+    const struct bwp_state *state, *latest_state;
 
     pns = acki->pns;
     ctl->sc_flags |= SC_ACK_RECV_INIT << pns;
@@ -1372,11 +1506,38 @@ lsquic_send_ctl_got_ack (lsquic_send_ctl_t *ctl,
                     is the "maximum burst" parameter */
                     < ctl->sc_ci->cci_get_cwnd(CGP(ctl));
   after_checks:
+            state = packet_out->po_bwp_state;
+            latest_sent_packet = TAILQ_LAST(&ctl->sc_unacked_packets[pns], lsquic_packets_tailq);
+            latest_state = latest_sent_packet->po_bwp_state;
+            if (latest_state != NULL && state != NULL && (ack_recv_time - state->bwps_last_ack_ack_time))
+                ctl->sc_ack_rate = BW_FROM_BYTES_AND_DELTA(
+                    latest_state->bwps_send_state.total_bytes_acked - state->bwps_send_state.total_bytes_acked,
+                    ack_recv_time - state->bwps_last_ack_ack_time).value;
             ctl->sc_largest_acked_packno    = packet_out->po_packno;
             ctl->sc_largest_acked_sent_time = packet_out->po_sent;
             ecn_total_acked += lsquic_packet_out_ecn(packet_out) != ECN_NOT_ECT;
             ecn_ce_cnt += lsquic_packet_out_ecn(packet_out) == ECN_CE;
             one_rtt_cnt += lsquic_packet_out_enc_level(packet_out) == ENC_LEV_FORW;
+            if(packet_out->po_fake_loss_rec == 1)
+            {
+                struct lsquic_art_feedback *temp_feedback;
+                if (ctl->sc_feedback_window_size >= ctl->sc_largest_feedbback_window)
+                {
+                    temp_feedback = TAILQ_FIRST(&ctl->sc_feedback_window);
+                    TAILQ_REMOVE(&ctl->sc_feedback_window, temp_feedback, af_next);
+                }
+                else
+                {
+                    temp_feedback = lsquic_malo_get(ctl->sc_conn_pub->packet_out_malo);
+                    if (temp_feedback)
+                    {
+                        memset(temp_feedback, 0, sizeof(*temp_feedback));
+                        ctl->sc_feedback_window_size += 1;
+                    }
+                }
+                temp_feedback->feedback_value = 0;
+                TAILQ_INSERT_TAIL(&ctl->sc_feedback_window, temp_feedback, af_next);
+            }
             if (0 == (packet_out->po_flags
                                         & (PO_LOSS_REC|PO_POISON|PO_MTU_PROBE)))
             {
@@ -1389,6 +1550,12 @@ lsquic_send_ctl_got_ack (lsquic_send_ctl_t *ctl,
             else if (packet_out->po_flags & PO_LOSS_REC)
             {
                 packet_sz = packet_out->po_sent_sz;
+                if (packet_out->po_fake_loss_rec == 1)
+                {
+                    ctl->sc_n_in_flight_all -= 1;
+                    ctl->sc_bytes_unacked_all -= packet_sz;
+                    LSQ_DEBUG("unacked queue remove fake loss_record packet %"PRIu64", inflight is %u, unacked bytes %u", packet_out->po_packno, ctl->sc_n_in_flight_all, ctl->sc_bytes_unacked_all);
+                }
                 TAILQ_REMOVE(&ctl->sc_unacked_packets[pns], packet_out,
                                                                     po_next);
                 LSQ_DEBUG("acking via loss record %"PRIu64,
@@ -1537,65 +1704,80 @@ static struct lsquic_packet_out *
 send_ctl_next_lost (lsquic_send_ctl_t *ctl)
 {
     struct lsquic_conn *const lconn = ctl->sc_conn_pub->lconn;
-    struct lsquic_packet_out *lost_packet;
+    struct lsquic_packet_out *lost_packet, *next;
+    unsigned packet_sz;
 
-  get_next_lost:
-    lost_packet = TAILQ_FIRST(&ctl->sc_lost_packets);
-    if (lost_packet)
+    for (lost_packet = TAILQ_FIRST(&ctl->sc_lost_packets); lost_packet; lost_packet = next)
     {
-        if (lost_packet->po_frame_types & (1 << QUIC_FRAME_STREAM))
+        next = TAILQ_NEXT(lost_packet, po_next);
+        if (lost_packet)
         {
-            if (0 == (lost_packet->po_flags & PO_MINI))
+            if (lost_packet->po_frame_types & (1 << QUIC_FRAME_STREAM))
             {
-                LSQ_DEBUG("prepare to elide packet %"PRIu64" its original packno is %"PRIu64, lost_packet->po_packno, lost_packet->po_retrans_no);
-                lsquic_packet_out_elide_reset_stream_frames(lost_packet,
-                                                                    UINT64_MAX);
-                if (lost_packet->po_regen_sz >= lost_packet->po_data_sz)
+                if (0 == (lost_packet->po_flags & PO_MINI))
                 {
-                    LSQ_DEBUG("Dropping packet %"PRIu64" from lost queue",
-                        lost_packet->po_packno);
-                    TAILQ_REMOVE(&ctl->sc_lost_packets, lost_packet, po_next);
-                    lost_packet->po_flags &= ~PO_LOST;
-                    send_ctl_destroy_chain(ctl, lost_packet, NULL);
-                    send_ctl_destroy_packet(ctl, lost_packet);
-                    goto get_next_lost;
+                    LSQ_DEBUG("prepare to elide packet %"PRIu64" its original packno is %"PRIu64, lost_packet->po_packno, lost_packet->po_retrans_no);
+                    lsquic_packet_out_elide_reset_stream_frames(lost_packet,
+                                                                        UINT64_MAX);
+                    if (lost_packet->po_regen_sz >= lost_packet->po_data_sz)
+                    {
+                        LSQ_DEBUG("Dropping packet %"PRIu64" from lost queue",
+                            lost_packet->po_packno);
+                        TAILQ_REMOVE(&ctl->sc_lost_packets, lost_packet, po_next);
+                        ctl->sc_lost_packet_number--;
+                        lost_packet->po_flags &= ~PO_LOST;
+                        packet_sz = packet_out_sent_sz(lost_packet);
+                        send_ctl_destroy_chain(ctl, lost_packet, NULL);
+                        send_ctl_destroy_packet(ctl, lost_packet);
+                        if (lost_packet->po_fake_loss_rec == 1)
+                        {
+                            ctl->sc_n_in_flight_all -= 1;
+                            ctl->sc_bytes_unacked_all -= packet_sz;
+                            LSQ_DEBUG("unacked queue remove fake loss_record packet %"PRIu64" from lost queue, inflight is %u, unacked bytes %u", lost_packet->po_packno, ctl->sc_n_in_flight_all, ctl->sc_bytes_unacked_all);
+                        }
+                        continue;
+                    }
                 }
+                else
+                {
+                    /* Mini connection only ever sends data on stream 1.  There
+                    * is nothing to elide: always resend it.
+                    */
+                    ;
+                }
+            }
+            LSQ_DEBUG("lost packet fake_loss, retrans_number, need_retrans is: %u, %u, %u", lost_packet->po_fake_loss_rec, lost_packet->po_retrans_packet_number, lost_packet->po_need_retrans_number);
+            if (!(lost_packet->po_fake_loss_rec && lost_packet->po_retrans_packet_number > 0) && !lsquic_send_ctl_can_send(ctl))
+                continue;
+            if (lost_packet->po_fake_loss_rec && lost_packet->po_retrans_packet_number > 0)
+                LSQ_DEBUG("send duplicate packet %"PRIu64" due to oppotunistism, ignore can_send: %u", lost_packet->po_packno, lsquic_send_ctl_can_send(ctl));
+
+            if (packet_out_total_sz(lost_packet) <= SC_PACK_SIZE(ctl))
+            {
+    pop_lost_packet:
+                TAILQ_REMOVE(&ctl->sc_lost_packets, lost_packet, po_next);
+                ctl->sc_lost_packet_number--;
+                lost_packet->po_flags &= ~PO_LOST;
+                lost_packet->po_flags |= PO_RETX;
             }
             else
             {
-                /* Mini connection only ever sends data on stream 1.  There
-                 * is nothing to elide: always resend it.
-                 */
-                ;
+                /* We delay resizing lost packets as long as possible, hoping that
+                * it may be ACKed.  At this point, however, we have to resize.
+                */
+                if (0 == split_lost_packet(ctl, lost_packet))
+                {
+                    lost_packet = TAILQ_FIRST(&ctl->sc_lost_packets);
+                    goto pop_lost_packet;
+                }
+                lconn->cn_if->ci_internal_error(lconn,
+                                                    "error resizing lost packet");
+                return NULL;
             }
-        }
-
-        if (!lsquic_send_ctl_can_send(ctl))
-            return NULL;
-
-        if (packet_out_total_sz(lost_packet) <= SC_PACK_SIZE(ctl))
-        {
-  pop_lost_packet:
-            TAILQ_REMOVE(&ctl->sc_lost_packets, lost_packet, po_next);
-            lost_packet->po_flags &= ~PO_LOST;
-            lost_packet->po_flags |= PO_RETX;
-        }
-        else
-        {
-            /* We delay resizing lost packets as long as possible, hoping that
-             * it may be ACKed.  At this point, however, we have to resize.
-             */
-            if (0 == split_lost_packet(ctl, lost_packet))
-            {
-                lost_packet = TAILQ_FIRST(&ctl->sc_lost_packets);
-                goto pop_lost_packet;
-            }
-            lconn->cn_if->ci_internal_error(lconn,
-                                                "error resizing lost packet");
-            return NULL;
+            break;
         }
     }
-
+    
     return lost_packet;
 }
 
@@ -1617,6 +1799,7 @@ void
 lsquic_send_ctl_cleanup (lsquic_send_ctl_t *ctl)
 {
     lsquic_packet_out_t *packet_out, *next;
+    lsquic_art_feedback_t *temp_feedback;
     enum packnum_space pns;
     unsigned n;
 
@@ -1638,17 +1821,25 @@ lsquic_send_ctl_cleanup (lsquic_send_ctl_t *ctl)
             {
                 ctl->sc_bytes_unacked_all -= packet_out_sent_sz(packet_out);
                 --ctl->sc_n_in_flight_all;
+                LSQ_DEBUG("clean up, inflight-1 is %d", ctl->sc_n_in_flight_all);
             }
 #endif
             send_ctl_destroy_packet(ctl, packet_out);
         }
-    assert(0 == ctl->sc_n_in_flight_all);
-    assert(0 == ctl->sc_bytes_unacked_all);
+    // assert(0 == ctl->sc_n_in_flight_all);
+    // assert(0 == ctl->sc_bytes_unacked_all);
     while ((packet_out = TAILQ_FIRST(&ctl->sc_lost_packets)))
     {
         TAILQ_REMOVE(&ctl->sc_lost_packets, packet_out, po_next);
+        ctl->sc_lost_packet_number--;
         packet_out->po_flags &= ~PO_LOST;
         send_ctl_destroy_packet(ctl, packet_out);
+    }
+    while ((temp_feedback = TAILQ_FIRST(&ctl->sc_feedback_window)))
+    {
+        TAILQ_REMOVE(&ctl->sc_feedback_window, temp_feedback, af_next);
+        ctl->sc_feedback_window_size--;
+        lsquic_malo_put(temp_feedback);
     }
     while ((packet_out = TAILQ_FIRST(&ctl->sc_0rtt_stash)))
     {
@@ -2472,16 +2663,12 @@ lsquic_send_ctl_reschedule_packets (lsquic_send_ctl_t *ctl)
         update_for_resending(ctl, packet_out);
         packet_out->po_retrans_no = old_packno;
         lsquic_send_ctl_scheduled_one(ctl, packet_out);
-        LSQ_DEBUG("OR3 detect %"PRIu64" has been retransmit %u times, new packno is %"PRIu64" now packet number is %u", old_packno, packet_out->po_retrans_times, packet_out->po_packno, packet_out->po_retrans_packet_number);
-        if((ctl->sc_or3_flag && packet_out->po_frame_types != QUIC_FTBIT_PADDING) && (packet_out->po_frame_types & (1 << QUIC_FRAME_STREAM)))
+        LSQ_DEBUG("ART detect %"PRIu64" has been retransmit %u times, new packno is %"PRIu64" now packet number is %u", old_packno, packet_out->po_retrans_times, packet_out->po_packno, packet_out->po_retrans_packet_number);
+        if((ctl->sc_art_flag && packet_out->po_frame_types != QUIC_FTBIT_PADDING) && (packet_out->po_frame_types & (1 << QUIC_FRAME_STREAM)))
         {
-        //     LSQ_DEBUG("OR3 detect packets frame type %u", packet_out->po_frame_types);
-        //     lsquic_packet_out_t *temp = lsquic_send_ctl_copy_packet_out(ctl, packet_out, old_packno, packet_out->po_retrans_times);
-        //     temp->po_pre_packet = packet_out;
-        //     send_ctl_dup_append(ctl, temp);
-            if (!lsquic_alarmset_is_set(ctl->sc_alset, AL_OR3_SCHE))
+            if (!lsquic_alarmset_is_set(ctl->sc_alset, AL_ART_SCHE))
             {
-                lsquic_alarmset_set(ctl->sc_alset, AL_OR3_SCHE, lsquic_time_now()+1);
+                lsquic_alarmset_set(ctl->sc_alset, AL_ART_SCHE, lsquic_time_now()+1);
             }
         }
     }
@@ -2493,49 +2680,105 @@ lsquic_send_ctl_reschedule_packets (lsquic_send_ctl_t *ctl)
 }
 
 static void
-or3_schedule(enum alarm_id al_id, void *ctx, lsquic_time_t expiry, lsquic_time_t now)
+debug_network(enum alarm_id al_id, void *ctx, lsquic_time_t expiry, lsquic_time_t now)
+{
+    lsquic_send_ctl_t *ctl = ctx;
+    output_network_status(ctl);
+    if (!lsquic_alarmset_is_set(ctl->sc_alset, AL_DEBUG_STATUS))
+    {   
+        lsquic_alarmset_set(ctl->sc_alset, AL_DEBUG_STATUS, lsquic_time_now()+5000);
+    }
+}
+
+static void
+output_network_status(lsquic_send_ctl_t *ctl)
+{
+    uint64_t pacing_rate = ctl->sc_ci->cci_pacing_rate(CGP(ctl), 0);
+    unsigned long cwnd = ctl->sc_ci->cci_get_cwnd(CGP(ctl));
+    lsquic_time_t srtt = lsquic_rtt_stats_get_srtt(&ctl->sc_conn_pub->rtt_stats);
+    lsquic_time_t minrtt = lsquic_rtt_stats_get_min_rtt(&ctl->sc_conn_pub->rtt_stats);
+    lsquic_art_feedback_t *temp_feedback, *next_feedback;
+    unsigned feedback_num = 0;
+
+    for (temp_feedback = TAILQ_FIRST(&ctl->sc_feedback_window); temp_feedback;
+                                                            temp_feedback = next_feedback)
+    {
+        next_feedback = TAILQ_NEXT(temp_feedback, af_next);
+        LSQ_DEBUG("DEBUG: feedback series: %u, feedback value: %u", feedback_num++, temp_feedback->feedback_value);
+    }
+    LSQ_DEBUG("DEBUG: Network Status: CWND: %"PRIu64", Unacked_all: %u, Inflight: %u, SRTT: %"PRIu64", RTT: %"PRIu64", Pacing_rate: %"PRIu64", Send_rate: %"PRIu64", Ack_rate: %"PRIu64", Lost_queue_length: %u, All_retrans_packets: %"PRIu64, 
+            cwnd, ctl->sc_bytes_unacked_all, ctl->sc_n_in_flight_all, srtt, minrtt, pacing_rate, ctl->sc_send_rate, ctl->sc_ack_rate, ctl->sc_lost_packet_number, ctl->sc_all_retrans_packet_num);
+}
+
+static void
+art_schedule(enum alarm_id al_id, void *ctx, lsquic_time_t expiry, lsquic_time_t now)
 {
     lsquic_send_ctl_t *ctl = ctx;
     struct lsquic_packet_out *packet_out, *next;
     struct lsquic_packet_out *loss_record;
     enum packnum_space pns;
-    unsigned short n_packets = 0, n_schd = 0;
+    unsigned short n_packets = 0, retrans_packets = 0, no_handle_packets = 0, no_frame_packets = 0;
+    int diff = 0;
+    int temp_inflight = 0;
 
-    LSQ_DEBUG("start or3 schedule");
+    LSQ_DEBUG("start art schedule, inflight is %u", ctl->sc_n_in_flight_all);
+    temp_inflight = ctl->sc_n_in_flight_all;
     for (pns = PNS_INIT; pns < N_PNS; ++pns)
-        TAILQ_FOREACH(packet_out, &ctl->sc_unacked_packets[pns], po_next)
+    {
+        for (packet_out = TAILQ_FIRST(&ctl->sc_unacked_packets[pns]); packet_out;
+                                                            packet_out = next)
         {
-            // if (packet_out->po_fake_loss_rec && !(packet_out->po_flags & PO_LOSS_REC))
-            // {
-            //     LSQ_DEBUG("OR3 detect packet %"PRIu64" need to be retransmitted, packno is %"PRIu64", packet number is %u, has retransmit %u times.", 
-            //         packet_out->po_retrans_no, packet_out->po_packno, packet_out->po_retrans_packet_number, packet_out->po_retrans_times);
-            // }
-            if (packet_out->po_fake_loss_rec && !(packet_out->po_flags & PO_LOSS_REC) && packet_out->po_retrans_packet_number < packet_out->po_need_retrans_number)
+            lsquic_time_t now = lsquic_time_now();
+            int64_t diff_time = packet_out->po_expected_sent - now;
+            LSQ_DEBUG("now is %"PRIu64", packet_expect is %"PRIu64" diff time is %ld", now, packet_out->po_expected_sent, diff_time);
+            next = TAILQ_NEXT(packet_out, po_next);
+            n_packets++;
+            if ((packet_out->po_frame_types & (1 << QUIC_FRAME_STREAM)))
             {
-                next = TAILQ_NEXT(packet_out, po_next);
-                n_packets++;
-                // loss_record = send_ctl_record_loss(ctl, packet_out);
-                // loss_record->po_fake_loss_rec = 1;
-                // LSQ_DEBUG("After copy, OR3 detect loss_record is %u, packet loss_rec is %u", (loss_record->po_flags & PO_LOSS_REC), (packet_out->po_flags & PO_LOSS_REC));
-                // LSQ_DEBUG("OR3 successfully retransmit packet %"PRIu64" duplicate, packet number is %u, has retransmit %u times.", 
-                //     packet_out->po_retrans_no, packet_out->po_retrans_packet_number, packet_out->po_retrans_times);
-                // packet_out->po_retrans_packet_number += 1;
-                // //packet_out->po_retrans_last = 1;
-                // lsquic_packno_t old_packno = packet_out->po_retrans_no ? packet_out->po_retrans_no : packet_out->po_packno;
-                // packet_out->po_retrans_no = old_packno;
-                // lsquic_send_ctl_scheduled_one(ctl, packet_out);
-                send_ctl_handle_regular_lost_packet(ctl,
-                                                        packet_out, &next);
+                if (packet_out->po_fake_loss_rec && !(packet_out->po_flags & PO_LOSS_REC) 
+                    && packet_out->po_retrans_packet_number < packet_out->po_need_retrans_number
+                    && diff_time <= 0)
+                {
+                    retrans_packets++;
+                    ctl->sc_all_retrans_packet_num++;
+                    // loss_record = send_ctl_record_loss(ctl, packet_out);
+                    // loss_record->po_fake_loss_rec = 1;
+                    // LSQ_DEBUG("After copy, OR3 detect loss_record is %u, packet loss_rec is %u", (loss_record->po_flags & PO_LOSS_REC), (packet_out->po_flags & PO_LOSS_REC));
+                    // LSQ_DEBUG("OR3 successfully retransmit packet %"PRIu64" duplicate, packet number is %u, has retransmit %u times.", 
+                    //     packet_out->po_retrans_no, packet_out->po_retrans_packet_number, packet_out->po_retrans_times);
+                    // packet_out->po_retrans_packet_number += 1;
+                    // //packet_out->po_retrans_last = 1;
+                    // lsquic_packno_t old_packno = packet_out->po_retrans_no ? packet_out->po_retrans_no : packet_out->po_packno;
+                    // packet_out->po_retrans_no = old_packno;
+                    // lsquic_send_ctl_scheduled_one(ctl, packet_out);
+
+                    send_ctl_handle_regular_lost_packet(ctl,
+                                                            packet_out, &next);
+                    LSQ_DEBUG("packet %"PRIu64" be retransmitted in %u, its retrans_no, fake_loss, loss_rec, retrans_number, need_retrans_number, retrans_times, been_detect_loss is %"PRIu64", %u, %u, %u, %u, %u, %u", 
+                                packet_out->po_packno, pns, packet_out->po_retrans_no, packet_out->po_fake_loss_rec, packet_out->po_flags&PO_LOSS_REC, packet_out->po_retrans_packet_number, 
+                                packet_out->po_need_retrans_number, packet_out->po_retrans_times, packet_out->po_been_detect_loss);
+                }
+                else
+                {
+                    no_handle_packets += 1;
+                    if (!packet_out->po_fake_loss_rec)
+                        no_handle_packets -= 1;
+                    LSQ_DEBUG("packet %"PRIu64" don't need to be retransmitted in %u, its retrans_no, fake_loss, loss_rec, retrans_number, need_retrans_number, retrans_times is, nohandle, been_detect_loss, po_expect_sent, bigger_than_now is %"PRIu64", %u, %u, %u, %u, %u, %u, %u, %"PRIu64", %u", 
+                                packet_out->po_packno, pns, packet_out->po_retrans_no, packet_out->po_fake_loss_rec, packet_out->po_flags&PO_LOSS_REC, packet_out->po_retrans_packet_number, 
+                                packet_out->po_need_retrans_number, packet_out->po_retrans_times, no_handle_packets, packet_out->po_been_detect_loss, packet_out->po_expected_sent, (packet_out->po_expected_sent >= now));
+                }
             }
             else
             {
-                LSQ_DEBUG("packet %"PRIu64" don't need to be retransmitted in %u, its retrans_no, fake_loss, loss_rec, retrans_number, need_retrans_number, retrans_times is %"PRIu64", %u, %u, %u, %u, %u", 
-                            packet_out->po_packno, pns, packet_out->po_retrans_no, packet_out->po_fake_loss_rec, packet_out->po_flags&PO_LOSS_REC, packet_out->po_retrans_packet_number, 
-                            packet_out->po_need_retrans_number, packet_out->po_retrans_times);
+                // LSQ_DEBUG("packet %"PRIu64" is not stream packet.", packet_out->po_packno);
+                no_frame_packets += 1;
             }
         }
+    }
     //n_schd = lsquic_send_ctl_reschedule_packets(ctl);
-    LSQ_DEBUG("OR3 generate %u packets duplicate, schedule %u packets", n_packets, n_schd);
+    LSQ_DEBUG("ART generate %u packets duplicate, normal %u packets, ignore %u packets, handle %u packets, inflight %u packets, lost %u packets, sc_loss_count %u", retrans_packets, no_handle_packets, no_frame_packets, n_packets, ctl->sc_n_in_flight_all, ctl->sc_lost_packet_number, ctl->sc_loss_count);
+    assert(ctl->sc_n_in_flight_all == temp_inflight);
+    //assert((ctl->sc_n_in_flight_all) == (retrans_packets + no_handle_packets + no_frame_packets));
     // LSQ_DEBUG("OR3 schedule in time");
     // packet_out = TAILQ_FIRST(&ctl->sc_duplicate_packets);
     // if (!packet_out)
@@ -2579,9 +2822,10 @@ or3_schedule(enum alarm_id al_id, void *ctx, lsquic_time_t expiry, lsquic_time_t
     // LSQ_DEBUG("delay is %"PRIu64", OR3 has %u packet to copy.", delay, ctl->sc_remained_dup_num);
     // ctl->sc_remained_dup_num -= 1;
     // ctl->sc_remained_min_rtt_time -= delay;
-    if (!lsquic_alarmset_is_set(ctl->sc_alset, AL_OR3_SCHE))
-    {
-        lsquic_alarmset_set(ctl->sc_alset, AL_OR3_SCHE, lsquic_time_now()+100);
+    if (!lsquic_alarmset_is_set(ctl->sc_alset, AL_ART_SCHE))
+    {   
+        int delay = 30;
+        lsquic_alarmset_set(ctl->sc_alset, AL_ART_SCHE, lsquic_time_now()+delay);
     }
 }
 
@@ -2597,13 +2841,13 @@ or3_schedule2(enum alarm_id al_id, void *ctx, lsquic_time_t expiry, lsquic_time_
     if (!packet_out)
     {
         LSQ_DEBUG("OR3 schedule in time, but no packet");
-        lsquic_alarmset_set(ctl->sc_alset, AL_OR3_SCHE, lsquic_time_now()+10);
+        lsquic_alarmset_set(ctl->sc_alset, AL_ART_SCHE, lsquic_time_now()+10);
         return;
     }
     // schedule new packet
     if (ctl->sc_remained_dup_num == 0)
     {
-        unsigned re_num = lsquic_packet_out_duplicate_number(packet_out);
+        unsigned re_num = art_duplicate_number(ctl, packet_out);
         ctl->sc_remained_min_rtt_time = lsquic_rtt_stats_get_min_rtt(&ctl->sc_conn_pub->rtt_stats)/2;
         ctl->sc_remained_dup_num = re_num;
         LSQ_DEBUG("min rtt is %"PRIu64, ctl->sc_remained_min_rtt_time);
@@ -2635,7 +2879,7 @@ or3_schedule2(enum alarm_id al_id, void *ctx, lsquic_time_t expiry, lsquic_time_
     LSQ_DEBUG("delay is %"PRIu64", OR3 has %u packet to copy.", delay, ctl->sc_remained_dup_num);
     ctl->sc_remained_dup_num -= 1;
     ctl->sc_remained_min_rtt_time -= delay;
-    lsquic_alarmset_set(ctl->sc_alset, AL_OR3_SCHE, lsquic_time_now()+delay);
+    lsquic_alarmset_set(ctl->sc_alset, AL_ART_SCHE, lsquic_time_now()+delay);
 }
 
 void
@@ -3511,6 +3755,7 @@ split_lost_packet (struct lsquic_send_ctl *ctl,
 
     LSQ_DEBUG("drop oversized lost packet #%"PRIu64, packet_out->po_packno);
     TAILQ_REMOVE(&ctl->sc_lost_packets, packet_out, po_next);
+    ctl->sc_lost_packet_number--;
     packet_out->po_flags &= ~PO_LOST;
     send_ctl_destroy_chain(ctl, packet_out, NULL);
     send_ctl_destroy_packet(ctl, packet_out);
@@ -4301,6 +4546,7 @@ lsquic_send_ctl_0rtt_to_1rtt (struct lsquic_send_ctl *ctl)
     {
         TAILQ_REMOVE(&ctl->sc_0rtt_stash, packet_out, po_next);
         TAILQ_INSERT_TAIL(&ctl->sc_lost_packets, packet_out, po_next);
+        ctl->sc_lost_packet_number++;
         packet_out->po_flags |= PO_LOST;
     }
 

@@ -420,6 +420,7 @@ stream_new_common (lsquic_stream_id_t id, struct lsquic_conn_public *conn_pub,
     stream->stream_if = stream_if;
     stream->conn_pub  = conn_pub;
     stream->sm_onnew_arg = stream_if_ctx;
+    stream->open_time = lsquic_time_now();
     stream->sm_write_avail = stream_write_avail_no_frames;
 
     STAILQ_INIT(&stream->sm_hq_frames);
@@ -742,7 +743,19 @@ maybe_finish_stream (lsquic_stream_t *stream)
 {
     if (0 == (stream->stream_flags & STREAM_FINISHED) &&
                                                     stream_is_finished(stream))
-        lsquic_stream_force_finish(stream);
+        {
+            if (stream->open_time)
+            {
+                if (stream->filename)
+                {
+                    LSQ_DEBUG("file %s transfer stream finish cost %"PRIu64" microseconds.", stream->filename, lsquic_time_now()-stream->open_time);
+                    free(stream->filename);
+                }
+                else
+                    LSQ_DEBUG("stream finish cost %"PRIu64" microseconds.", lsquic_time_now()-stream->open_time);
+            }
+            lsquic_stream_force_finish(stream);
+        }
 }
 
 
@@ -5521,4 +5534,18 @@ int
 lsquic_stream_has_unacked_data (struct lsquic_stream *stream)
 {
     return stream->n_unacked > 0 || stream->sm_n_buffered > 0;
+}
+
+void
+lsquic_stream_record_fct (struct lsquic_stream *stream, char *filename)
+{
+    if (stream->open_time)
+    {
+        LSQ_DEBUG("file %s send finished. Cost %"PRIu64" microseconds.", filename, lsquic_time_now()-stream->open_time);
+        if (filename)
+        {
+            char *temp = malloc(strlen(filename)+2);
+            stream->filename = temp;
+        }
+    }
 }

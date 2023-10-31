@@ -24,6 +24,7 @@ IF(MSVC)
 ENDIF()
 
 add_executable(http_server http_server.c prog.c test_common.c test_cert.c)
+add_executable(art_server art_server.c prog.c test_common.c test_cert.c)
 IF(NOT MSVC)   #   TODO: port MD5 server and client to Windows
 add_executable(md5_server md5_server.c prog.c test_common.c test_cert.c)
 add_executable(md5_client md5_client.c prog.c test_common.c test_cert.c)
@@ -59,6 +60,7 @@ ENDIF()
 
 TARGET_LINK_LIBRARIES(http_client ${LIBS})
 TARGET_LINK_LIBRARIES(http_server ${LIBS})
+TARGET_LINK_LIBRARIES(art_server ${LIBS})
 IF(NOT MSVC)
 TARGET_LINK_LIBRARIES(md5_server  ${LIBS})
 TARGET_LINK_LIBRARIES(md5_client  ${LIBS})

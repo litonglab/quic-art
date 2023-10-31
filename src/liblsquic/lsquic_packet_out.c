@@ -271,10 +271,13 @@ lsquic_packet_out_new (struct lsquic_mm *mm, struct malo *malo, int use_cid,
     packet_out->po_retrans_times = 0;
     packet_out->po_retrans_no = 0;
     packet_out->po_pre_packet = NULL;
-    packet_out->po_retrans_last = 0;
+    packet_out->po_remained_time = 0;
+    packet_out->po_last_lost_time = 0;
+    packet_out->po_been_detect_loss = 0;
     packet_out->po_retrans_packet_number = 0;
     packet_out->po_need_retrans_number = 0;
     packet_out->po_fake_loss_rec = 0;
+    packet_out->po_feedback_recorded = 0;
     return packet_out;
 }
 
@@ -558,4 +561,33 @@ lsquic_packet_out_pad_over (struct lsquic_packet_out *packet_out,
     }
 
     packet_out->po_frame_types &= ~frame_types;
+}
+
+lsquic_time_t
+lsquic_packet_out_schedule_time(struct lsquic_packet_out *packet_out, unsigned short init, lsquic_time_t now)
+{
+    int64_t time_left;
+    if (init)
+        packet_out->po_last_lost_time = now;
+    //set version no random
+    // packet_out->po_expected_sent = now;
+    // return 0;
+    if (packet_out->po_remained_time > 0 && (packet_out->po_retrans_packet_number <= packet_out->po_need_retrans_number))
+    {
+        srand((unsigned)time(NULL));
+        time_left = packet_out->po_remained_time - (now - packet_out->po_last_lost_time);
+        if (time_left <= 0)
+        {
+            packet_out->po_expected_sent = now;
+            return 0;
+        }
+        lsquic_time_t delay = rand()%time_left;
+        packet_out->po_expected_sent = now + delay;
+        return delay;
+    }
+    else
+    {
+        packet_out->po_expected_sent = now;
+        return 0;
+    }
 }

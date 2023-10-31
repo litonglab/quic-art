@@ -257,6 +257,8 @@ struct lsquic_stream
     const struct lsquic_stream_if  *stream_if;
     struct lsquic_stream_ctx       *st_ctx;
     struct lsquic_conn_public      *conn_pub;
+    lsquic_time_t                   open_time;
+    char                           *filename;
     TAILQ_ENTRY(lsquic_stream)      next_send_stream, next_read_stream,
                                         next_write_stream, next_service_stream,
                                         next_prio_stream;
@@ -596,6 +598,9 @@ enum stream_state_receiving
 };
 
 extern const char *const lsquic_ssr2str[];
+
+void
+lsquic_stream_record_fct (struct lsquic_stream *stream, char *filename);
 
 enum stream_state_receiving
 lsquic_stream_receiving_state (struct lsquic_stream *);

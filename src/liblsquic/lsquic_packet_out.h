@@ -79,10 +79,13 @@ typedef struct lsquic_packet_out
     lsquic_time_t      po_expected_sent;       /* Time pretended to be sent accroding by OR3 */
     unsigned short     po_retrans_times;      /* Retransmit turn number*/
     unsigned short     po_retrans_packet_number;      /* Retransmit packet duplicate number in a turn*/
-    unsigned short     po_retrans_last;
+    lsquic_time_t      po_remained_time;
+    lsquic_time_t      po_last_lost_time;
     lsquic_packno_t    po_retrans_no;
     unsigned short     po_need_retrans_number;
+    unsigned short     po_been_detect_loss;
     unsigned short     po_fake_loss_rec;
+    unsigned short     po_feedback_recorded;
     struct lsquic_packet_out 
                       *po_pre_packet;
 
@@ -217,7 +220,6 @@ typedef struct lsquic_packet_out
 #define lsquic_packet_out_avail(p) ((unsigned short) \
                                         ((p)->po_n_alloc - (p)->po_data_sz))
 
-#define lsquic_packet_out_duplicate_number(p) ((3))
 
 #define lsquic_packet_out_packno_bits(p) (((p)->po_flags >> POBIT_SHIFT) & 0x3)
 
@@ -367,5 +369,8 @@ lsquic_packet_out_equal_dcids (const struct lsquic_packet_out *,
 void
 lsquic_packet_out_pad_over (struct lsquic_packet_out *packet_out,
                                                 enum quic_ft_bit frame_types);
+
+lsquic_time_t
+lsquic_packet_out_schedule_time(struct lsquic_packet_out *packet_out, unsigned short init, lsquic_time_t now);
 
 #endif
