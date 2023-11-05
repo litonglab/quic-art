@@ -3658,8 +3658,7 @@ split_lost_packet (struct lsquic_send_ctl *ctl,
 
 
 int
-lsquic_send_ctl_retry (struct lsquic_send_ctl *ctl,
-                                const unsigned char *token, size_t token_sz)
+lsquic_send_ctl_retry (struct lsquic_send_ctl *ctl, const unsigned char *token, size_t token_sz)
 {
     struct lsquic_packet_out *packet_out, *next;
     struct lsquic_conn *const lconn = ctl->sc_conn_pub->lconn;
