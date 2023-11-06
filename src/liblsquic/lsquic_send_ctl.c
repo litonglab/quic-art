@@ -2741,16 +2741,6 @@ art_schedule(enum alarm_id al_id, void *ctx, lsquic_time_t expiry, lsquic_time_t
                 {
                     retrans_packets++;
                     ctl->sc_all_retrans_packet_num++;
-                    // loss_record = send_ctl_record_loss(ctl, packet_out);
-                    // loss_record->po_fake_loss_rec = 1;
-                    // LSQ_DEBUG("After copy, OR3 detect loss_record is %u, packet loss_rec is %u", (loss_record->po_flags & PO_LOSS_REC), (packet_out->po_flags & PO_LOSS_REC));
-                    // LSQ_DEBUG("OR3 successfully retransmit packet %"PRIu64" duplicate, packet number is %u, has retransmit %u times.", 
-                    //     packet_out->po_retrans_no, packet_out->po_retrans_packet_number, packet_out->po_retrans_times);
-                    // packet_out->po_retrans_packet_number += 1;
-                    // //packet_out->po_retrans_last = 1;
-                    // lsquic_packno_t old_packno = packet_out->po_retrans_no ? packet_out->po_retrans_no : packet_out->po_packno;
-                    // packet_out->po_retrans_no = old_packno;
-                    // lsquic_send_ctl_scheduled_one(ctl, packet_out);
 
                     send_ctl_handle_regular_lost_packet(ctl,
                                                             packet_out, &next);
@@ -2778,108 +2768,12 @@ art_schedule(enum alarm_id al_id, void *ctx, lsquic_time_t expiry, lsquic_time_t
     //n_schd = lsquic_send_ctl_reschedule_packets(ctl);
     LSQ_DEBUG("ART generate %u packets duplicate, normal %u packets, ignore %u packets, handle %u packets, inflight %u packets, lost %u packets, sc_loss_count %u", retrans_packets, no_handle_packets, no_frame_packets, n_packets, ctl->sc_n_in_flight_all, ctl->sc_lost_packet_number, ctl->sc_loss_count);
     assert(ctl->sc_n_in_flight_all == temp_inflight);
-    //assert((ctl->sc_n_in_flight_all) == (retrans_packets + no_handle_packets + no_frame_packets));
-    // LSQ_DEBUG("OR3 schedule in time");
-    // packet_out = TAILQ_FIRST(&ctl->sc_duplicate_packets);
-    // if (!packet_out)
-    // {
-    //     LSQ_DEBUG("OR3 schedule in time, but no packet");
-    //     lsquic_alarmset_set(ctl->sc_alset, AL_OR3_SCHE, lsquic_time_now()+10);
-    //     return;
-    // }
-    // // schedule new packet
-    // if (ctl->sc_remained_dup_num == 0)
-    // {
-    //     unsigned re_num = lsquic_packet_out_duplicate_number(packet_out);
-    //     ctl->sc_remained_min_rtt_time = lsquic_rtt_stats_get_min_rtt(&ctl->sc_conn_pub->rtt_stats)/2;
-    //     ctl->sc_remained_dup_num = re_num;
-    //     LSQ_DEBUG("min rtt is %"PRIu64, ctl->sc_remained_min_rtt_time);
-    // }
-    // new_packet = lsquic_send_ctl_copy_packet_out(ctl, packet_out, 0, packet_out->po_retrans_times);
-    // new_packet->po_loss_chain = packet_out->po_pre_packet->po_loss_chain;
-    // packet_out->po_pre_packet->po_loss_chain = new_packet;
-    // send_ctl_sched_append(ctl, new_packet);
-    // packet_out->po_pre_packet = new_packet;
-    // LSQ_DEBUG("OR3 successfully retransmit packet %"PRIu64" duplicate, new packet %"PRIu64", has retransmit %u times.", 
-    //            packet_out->po_retrans_no, new_packet->po_packno, new_packet->po_retrans_times);
     
-    // if (ctl->sc_remained_dup_num == 1)
-    //     TAILQ_REMOVE(&ctl->sc_duplicate_packets, packet_out, po_next);
-    
-    // // set OR3 duplicate package schedule next time
-    // srand((unsigned)time(NULL));
-    // int rand_send_time = ctl->sc_remained_dup_num;
-    // for (unsigned i = 0; i < ctl->sc_remained_dup_num; i++)
-    // {
-    //     int temp = rand()%ctl->sc_remained_dup_num;
-    //     //get minimal value
-    //     if (temp < rand_send_time)
-    //         rand_send_time = temp;
-    // }
-    // LSQ_DEBUG("random is %d.", rand_send_time);
-    // lsquic_time_t delay = (ctl->sc_remained_min_rtt_time/(ctl->sc_remained_dup_num))*rand_send_time;
-    // delay = (delay == 0) ? 1 : delay;
-    // LSQ_DEBUG("delay is %"PRIu64", OR3 has %u packet to copy.", delay, ctl->sc_remained_dup_num);
-    // ctl->sc_remained_dup_num -= 1;
-    // ctl->sc_remained_min_rtt_time -= delay;
     if (!lsquic_alarmset_is_set(ctl->sc_alset, AL_ART_SCHE))
     {   
         int delay = 30;
         lsquic_alarmset_set(ctl->sc_alset, AL_ART_SCHE, lsquic_time_now()+delay);
     }
-}
-
-static void
-or3_schedule2(enum alarm_id al_id, void *ctx, lsquic_time_t expiry, lsquic_time_t now)
-{
-    lsquic_send_ctl_t *ctl = ctx;
-    lsquic_packet_out_t *packet_out;
-    lsquic_packet_out_t *new_packet;
-
-    LSQ_DEBUG("OR3 schedule in time");
-    packet_out = TAILQ_FIRST(&ctl->sc_duplicate_packets);
-    if (!packet_out)
-    {
-        LSQ_DEBUG("OR3 schedule in time, but no packet");
-        lsquic_alarmset_set(ctl->sc_alset, AL_ART_SCHE, lsquic_time_now()+10);
-        return;
-    }
-    // schedule new packet
-    if (ctl->sc_remained_dup_num == 0)
-    {
-        unsigned re_num = art_duplicate_number(ctl, packet_out);
-        ctl->sc_remained_min_rtt_time = lsquic_rtt_stats_get_min_rtt(&ctl->sc_conn_pub->rtt_stats)/2;
-        ctl->sc_remained_dup_num = re_num;
-        LSQ_DEBUG("min rtt is %"PRIu64, ctl->sc_remained_min_rtt_time);
-    }
-    new_packet = lsquic_send_ctl_copy_packet_out(ctl, packet_out, 0, packet_out->po_retrans_times);
-    new_packet->po_loss_chain = packet_out->po_pre_packet->po_loss_chain;
-    packet_out->po_pre_packet->po_loss_chain = new_packet;
-    send_ctl_sched_append(ctl, new_packet);
-    packet_out->po_pre_packet = new_packet;
-    LSQ_DEBUG("OR3 successfully retransmit packet %"PRIu64" duplicate, new packet %"PRIu64", has retransmit %u times.", 
-                packet_out->po_retrans_no, new_packet->po_packno, new_packet->po_retrans_times);
-    
-    if (ctl->sc_remained_dup_num == 1)
-        TAILQ_REMOVE(&ctl->sc_duplicate_packets, packet_out, po_next);
-    
-    // set OR3 duplicate package schedule next time
-    srand((unsigned)time(NULL));
-    int rand_send_time = ctl->sc_remained_dup_num;
-    for (unsigned i = 0; i < ctl->sc_remained_dup_num; i++)
-    {
-        int temp = rand()%ctl->sc_remained_dup_num;
-        //get minimal value
-        if (temp < rand_send_time)
-            rand_send_time = temp;
-    }
-    LSQ_DEBUG("random is %d.", rand_send_time);
-    lsquic_time_t delay = (ctl->sc_remained_min_rtt_time/(ctl->sc_remained_dup_num))*rand_send_time;
-    delay = (delay == 0) ? 1 : delay;
-    LSQ_DEBUG("delay is %"PRIu64", OR3 has %u packet to copy.", delay, ctl->sc_remained_dup_num);
-    ctl->sc_remained_dup_num -= 1;
-    ctl->sc_remained_min_rtt_time -= delay;
-    lsquic_alarmset_set(ctl->sc_alset, AL_ART_SCHE, lsquic_time_now()+delay);
 }
 
 void
@@ -3504,12 +3398,12 @@ lsquic_send_ctl_copy_packet_out (struct lsquic_send_ctl *ctl, struct lsquic_pack
     if (take_pno)
     {
         new->po_packno = take_pno;
-        LSQ_DEBUG("OR3 duplicate packet use exist %"PRIu64, new->po_packno);
+        LSQ_DEBUG("ART duplicate packet use exist %"PRIu64, new->po_packno);
     }
     else
     {
         new->po_packno = send_ctl_next_packno(ctl);
-        LSQ_DEBUG("OR3 duplicate packet use new number %"PRIu64, new->po_packno);
+        LSQ_DEBUG("ART duplicate packet use new number %"PRIu64, new->po_packno);
     }
     LSQ_DEBUG("after copy po_loss_chain is %"PRIu64, new->po_loss_chain->po_packno);
     return new;
@@ -3764,8 +3658,7 @@ split_lost_packet (struct lsquic_send_ctl *ctl,
 
 
 int
-lsquic_send_ctl_retry (struct lsquic_send_ctl *ctl,
-                                const unsigned char *token, size_t token_sz)
+lsquic_send_ctl_retry (struct lsquic_send_ctl *ctl, const unsigned char *token, size_t token_sz)
 {
     struct lsquic_packet_out *packet_out, *next;
     struct lsquic_conn *const lconn = ctl->sc_conn_pub->lconn;
