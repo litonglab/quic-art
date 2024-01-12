@@ -1298,6 +1298,7 @@ send_ctl_detect_losses (struct lsquic_send_ctl *ctl, enum packnum_space pns,
                 {
                     // only work one time
                     packet_out->po_been_detect_loss = 1;
+                    LSQ_ERROR("ART detect packet %"PRIu64" is lost, time is: %"PRIu64, packet_out->po_packno, time);
                     loss_record = send_ctl_handle_regular_lost_packet(ctl,
                                                             packet_out, &next);
                     if (loss_record)
@@ -1334,6 +1335,7 @@ send_ctl_detect_losses (struct lsquic_send_ctl *ctl, enum packnum_space pns,
             {
                 // only work one time
                 packet_out->po_been_detect_loss = 1;
+                LSQ_ERROR("ART detect packet %"PRIu64" is lost, time is: %"PRIu64, packet_out->po_packno, time);
                 (void) send_ctl_handle_lost_packet(ctl, packet_out, &next);
             }
             continue;
@@ -1361,6 +1363,7 @@ send_ctl_detect_losses (struct lsquic_send_ctl *ctl, enum packnum_space pns,
             {
                 // only work one time
                 packet_out->po_been_detect_loss = 1;
+                LSQ_ERROR("ART detect packet %"PRIu64" is lost, time is: %"PRIu64, packet_out->po_packno, time);
                 (void) send_ctl_handle_lost_packet(ctl, packet_out, &next);
             }
             continue;
@@ -1562,7 +1565,7 @@ lsquic_send_ctl_got_ack (lsquic_send_ctl_t *ctl,
                 lsquic_packet_out_ack_streams(packet_out);
                 LSQ_DEBUG("acking via regular record %"PRIu64,
                                                         packet_out->po_packno);
-                calc_multi_armed_bandit_reward(ctl, packet_out);
+                calc_multi_armed_bandit_reward(ctl, packet_out, now);
             }
             else if (packet_out->po_flags & PO_LOSS_REC)
             {
@@ -1577,7 +1580,7 @@ lsquic_send_ctl_got_ack (lsquic_send_ctl_t *ctl,
                                                                     po_next);
                 LSQ_DEBUG("acking via loss record %"PRIu64,
                                                         packet_out->po_packno);
-                calc_multi_armed_bandit_reward(ctl, packet_out);
+                calc_multi_armed_bandit_reward(ctl, packet_out, now);
                 send_ctl_maybe_increase_reord_thresh(ctl, packet_out,
                                                             prev_largest_acked);
 #if LSQUIC_CONN_STATS
@@ -1888,6 +1891,8 @@ lsquic_send_ctl_cleanup (lsquic_send_ctl_t *ctl)
         ctl->sc_stats.n_delayed);
 #endif
     free(ctl->sc_token);
+    LSQ_ERROR("DEBUG: Network Status: Unacked_all: %u, Lost_queue_length: %u, All_retrans_packets: %"PRIu64, 
+            ctl->sc_bytes_unacked_all, ctl->sc_lost_packet_number, ctl->sc_all_retrans_packet_num);
     LSQ_ERROR("Arm info:");
     for (unsigned temp_arm = 0; temp_arm < NUM_OF_ARMS; temp_arm++)
         LSQ_ERROR("   %uth arm: use_number: %u, expect: %f", temp_arm,
@@ -2686,7 +2691,7 @@ lsquic_send_ctl_reschedule_packets (lsquic_send_ctl_t *ctl)
         update_for_resending(ctl, packet_out);
         packet_out->po_retrans_no = old_packno;
         lsquic_send_ctl_scheduled_one(ctl, packet_out);
-        LSQ_DEBUG("ART detect %"PRIu64" has been retransmit %u times, new packno is %"PRIu64" now packet number is %u", old_packno, packet_out->po_retrans_times, packet_out->po_packno, packet_out->po_retrans_packet_number);
+        LSQ_ERROR("ART detect %"PRIu64" has been retransmit %u times, new packno is %"PRIu64" now packet number is %u", old_packno, packet_out->po_retrans_times, packet_out->po_packno, packet_out->po_retrans_packet_number);
         if((ctl->sc_art_flag && packet_out->po_frame_types != QUIC_FTBIT_PADDING) && (packet_out->po_frame_types & (1 << QUIC_FRAME_STREAM)))
         {
             if (!lsquic_alarmset_is_set(ctl->sc_alset, AL_ART_SCHE))

@@ -20,6 +20,7 @@ select_arm_with_epsilon_greedy_policy(struct lsquic_send_ctl *ctl);
 
 void
 calc_multi_armed_bandit_reward(struct lsquic_send_ctl *ctl,
-                                   struct lsquic_packet_out *packet_out);
+                               struct lsquic_packet_out *packet_out,
+                               lsquic_time_t now);
 
 #endif

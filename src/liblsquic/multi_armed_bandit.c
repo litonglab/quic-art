@@ -84,7 +84,7 @@ select_arm_with_epsilon_greedy_policy(struct lsquic_send_ctl *ctl)
 
 void
 calc_multi_armed_bandit_reward(struct lsquic_send_ctl *ctl,
-                                   struct lsquic_packet_out *packet_out)
+                                   struct lsquic_packet_out *packet_out, lsquic_time_t now)
 {
     unsigned cur_round, temp_arm_index, temp_use_number;
     double temp_reward, temp_expect;
@@ -100,8 +100,8 @@ calc_multi_armed_bandit_reward(struct lsquic_send_ctl *ctl,
     ctl->sc_all_arms[temp_arm_index].expect = 
             (temp_expect * temp_use_number + temp_reward)/(temp_use_number + 1);
     ctl->sc_all_arms[temp_arm_index].use_number += 1;
-    LSQ_ERROR("Reward was calculated. reward: %f, round: %u, arm: %u, use_number: %u, expect: %f",
-                temp_reward, cur_round, temp_arm_index+1, ctl->sc_all_arms[temp_arm_index].use_number,
+    LSQ_ERROR("Reward was calculated in %"PRIu64". reward: %f, round: %u, arm: %u, use_number: %u, expect: %f",
+                now, temp_reward, cur_round, temp_arm_index+1, ctl->sc_all_arms[temp_arm_index].use_number,
                 ctl->sc_all_arms[temp_arm_index].expect);
     cur_round--;
 
