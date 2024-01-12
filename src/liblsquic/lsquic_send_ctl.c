@@ -53,6 +53,7 @@
 #include "lsquic_qdec_hdl.h"
 #include "lsquic_crand.h"
 #include "lsquic_art_feedback.h"
+#include "multi_armed_bandit.h"
 
 #define LSQUIC_LOGGER_MODULE LSQLM_SENDCTL
 #define LSQUIC_LOG_CONN_ID lsquic_conn_log_cid(ctl->sc_conn_pub->lconn)
@@ -370,7 +371,7 @@ lsquic_send_ctl_init (lsquic_send_ctl_t *ctl, struct lsquic_alarmset *alset,
     ctl->sc_remained_dup_num = 0;
     ctl->sc_pre_dup_packet = NULL;
     // 1 means run art, 0 means not
-    ctl->sc_art_flag = 1;
+    ctl->sc_art_flag = 0;
     ctl->sc_all_retrans_packet_num = 0;
     ctl->sc_largest_feedbback_window = 10;
     ctl->sc_feedback_window_size = 0;
@@ -379,6 +380,10 @@ lsquic_send_ctl_init (lsquic_send_ctl_t *ctl, struct lsquic_alarmset *alset,
     ctl->sc_lost_packet_number = 0;
     assert(!(flags & ~(SC_IETF|SC_NSTP|SC_ECN)));
     ctl->sc_flags = flags;
+    ctl->sc_multi_arm_flag = 1;
+    assert(ctl->sc_multi_arm_flag != ctl->sc_art_flag);
+    ctl->sc_all_arms = malloc(NUM_OF_ARMS * sizeof(struct arm_of_bandit));
+    memset(ctl->sc_all_arms, 0, NUM_OF_ARMS * sizeof(struct arm_of_bandit));
     for(unsigned temp = 0; temp < MAX_ROUND_BOUND; temp++)
         ctl->sc_rounds_map[temp] = 2*temp - 1;
     send_ctl_pick_initial_packno(ctl);
@@ -922,6 +927,7 @@ send_ctl_destroy_chain (struct lsquic_send_ctl *ctl,
             LSQ_DEBUG("origin packet %"PRIu64" copy chain has packet %"PRIu64", its type is %u", chain_cur->po_retrans_no, chain_cur->po_packno, chain_cur->po_flags);
         }
         chain_next = chain_cur->po_loss_chain;
+        LSQ_DEBUG("chain_cur is %"PRIu64", chain_next is %"PRIu64", packet_out is %"PRIu64, chain_cur->po_packno, chain_next->po_packno, packet_out->po_packno);
         switch (chain_cur->po_flags & (PO_SCHED|PO_UNACKED|PO_LOST))
         {
         case PO_SCHED:
@@ -999,6 +1005,7 @@ send_ctl_record_loss (struct lsquic_send_ctl *ctl,
         /* Insert the loss record into the chain: */
         loss_record->po_loss_chain = packet_out->po_loss_chain;
         packet_out->po_loss_chain = loss_record;
+        loss_record->po_need_retrans_number = packet_out->po_need_retrans_number;
         /* Place the loss record next to the lost packet we are about to
          * remove from the list:
          */
@@ -1132,6 +1139,15 @@ send_ctl_handle_regular_lost_packet (struct lsquic_send_ctl *ctl,
                 if (ctl->sc_art_flag)
                 {
                     unsigned dup_number = art_duplicate_number(ctl, packet_out);
+                    packet_out->po_need_retrans_number = dup_number > 0 ? dup_number : 1;
+                    packet_out->po_fake_loss_rec = 1;
+                    delay = lsquic_packet_out_schedule_time(packet_out, 1, lsquic_time_now());
+                    LSQ_DEBUG("packet %"PRIu64" will be sent after %"PRIu64" microseconds delay. time_left %d, expect_sent is %"PRIu64", now is %"PRIu64, packet_out->po_packno, delay, (packet_out->po_remained_time - (lsquic_time_now() - packet_out->po_last_lost_time)), packet_out->po_expected_sent, lsquic_time_now());
+                }
+                if (ctl->sc_multi_arm_flag)
+                {
+                    //arm_index is 0-9, but arm is 1-10
+                    unsigned dup_number = select_arm_with_epsilon_greedy_policy(ctl) + 1;
                     packet_out->po_need_retrans_number = dup_number > 0 ? dup_number : 1;
                     packet_out->po_fake_loss_rec = 1;
                     delay = lsquic_packet_out_schedule_time(packet_out, 1, lsquic_time_now());
@@ -1546,6 +1562,7 @@ lsquic_send_ctl_got_ack (lsquic_send_ctl_t *ctl,
                 lsquic_packet_out_ack_streams(packet_out);
                 LSQ_DEBUG("acking via regular record %"PRIu64,
                                                         packet_out->po_packno);
+                calc_multi_armed_bandit_reward(ctl, packet_out);
             }
             else if (packet_out->po_flags & PO_LOSS_REC)
             {
@@ -1560,6 +1577,7 @@ lsquic_send_ctl_got_ack (lsquic_send_ctl_t *ctl,
                                                                     po_next);
                 LSQ_DEBUG("acking via loss record %"PRIu64,
                                                         packet_out->po_packno);
+                calc_multi_armed_bandit_reward(ctl, packet_out);
                 send_ctl_maybe_increase_reord_thresh(ctl, packet_out,
                                                             prev_largest_acked);
 #if LSQUIC_CONN_STATS
@@ -1870,6 +1888,11 @@ lsquic_send_ctl_cleanup (lsquic_send_ctl_t *ctl)
         ctl->sc_stats.n_delayed);
 #endif
     free(ctl->sc_token);
+    LSQ_ERROR("Arm info:");
+    for (unsigned temp_arm = 0; temp_arm < NUM_OF_ARMS; temp_arm++)
+        LSQ_ERROR("   %uth arm: use_number: %u, expect: %f", temp_arm,
+            ctl->sc_all_arms[temp_arm].use_number, ctl->sc_all_arms[temp_arm].expect);
+    free(ctl->sc_all_arms);
 }
 
 

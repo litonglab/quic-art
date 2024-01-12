@@ -83,6 +83,7 @@ SET(lsquic_STAT_SRCS
     lsquic_varint.c
     lsquic_version.c
     lsquic_art_feedback.c
+    multi_armed_bandit.c
 )
 
 IF(NOT MSVC)

@@ -25,6 +25,7 @@ struct ver_neg;
 enum pns;
 struct to_coal;
 struct lsquic_art_feedback;
+struct arm_of_bandit;
 
 enum buf_packet_type { BPT_HIGHEST_PRIO, BPT_OTHER_PRIO, };
 
@@ -82,6 +83,8 @@ typedef struct lsquic_send_ctl {
     unsigned                        sc_lost_packet_number;
     unsigned                        sc_largest_feedbback_window;
     unsigned                        sc_feedback_window_size;
+    unsigned                        sc_multi_arm_flag;
+    struct arm_of_bandit           *sc_all_arms;
     unsigned                        sc_rounds_map[MAX_ROUND_BOUND];
     unsigned long                   sc_all_retrans_packet_num;
     struct lsquic_packet_out       *sc_pre_dup_packet;
