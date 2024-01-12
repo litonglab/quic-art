@@ -53,6 +53,7 @@
 #include "lsquic_qdec_hdl.h"
 #include "lsquic_crand.h"
 #include "lsquic_art_feedback.h"
+#include "RL_Agent.h"
 
 #define LSQUIC_LOGGER_MODULE LSQLM_SENDCTL
 #define LSQUIC_LOG_CONN_ID lsquic_conn_log_cid(ctl->sc_conn_pub->lconn)
@@ -369,6 +370,13 @@ lsquic_send_ctl_init (lsquic_send_ctl_t *ctl, struct lsquic_alarmset *alset,
     ctl->sc_remained_min_rtt_time = 0;
     ctl->sc_remained_dup_num = 0;
     ctl->sc_pre_dup_packet = NULL;
+    int fd = -1;
+    if ((fd = open(ACTION_FILE, O_RDWR, 0)) == -1)
+    {
+        LSQ_ERROR("unable to open action.txt");
+        assert(0);
+    }
+    ctl->sc_shm_addr = mmap(NULL, ACTION_SHM_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     // 1 means run art, 0 means not
     ctl->sc_art_flag = 1;
     ctl->sc_all_retrans_packet_num = 0;
@@ -1131,7 +1139,8 @@ send_ctl_handle_regular_lost_packet (struct lsquic_send_ctl *ctl,
                 packet_out->po_remained_time = lsquic_rtt_stats_get_min_rtt(&ctl->sc_conn_pub->rtt_stats);
                 if (ctl->sc_art_flag)
                 {
-                    unsigned dup_number = art_duplicate_number(ctl, packet_out);
+                    // unsigned dup_number = art_duplicate_number(ctl, packet_out);
+                    unsigned dup_number = get_action(ctl);
                     packet_out->po_need_retrans_number = dup_number > 0 ? dup_number : 1;
                     packet_out->po_fake_loss_rec = 1;
                     delay = lsquic_packet_out_schedule_time(packet_out, 1, lsquic_time_now());

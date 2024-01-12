@@ -83,6 +83,7 @@ SET(lsquic_STAT_SRCS
     lsquic_varint.c
     lsquic_version.c
     lsquic_art_feedback.c
+    RL_Agent.c
 )
 
 IF(NOT MSVC)
