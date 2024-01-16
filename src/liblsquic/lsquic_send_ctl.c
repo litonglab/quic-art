@@ -370,13 +370,41 @@ lsquic_send_ctl_init (lsquic_send_ctl_t *ctl, struct lsquic_alarmset *alset,
     ctl->sc_remained_min_rtt_time = 0;
     ctl->sc_remained_dup_num = 0;
     ctl->sc_pre_dup_packet = NULL;
-    int fd = -1;
-    if ((fd = open(ACTION_FILE, O_RDWR, 0)) == -1)
+    ctl->sc_record_index = 0;
+    if ((ctl->sc_action_file_handler = open(ACTION_FILE, O_RDWR, 0)) == -1)
     {
         LSQ_ERROR("unable to open action.txt");
         assert(0);
     }
-    ctl->sc_shm_addr = mmap(NULL, ACTION_SHM_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    ctl->sc_action_addr = mmap(NULL, ACTION_SHM_SIZE, PROT_READ, MAP_SHARED, ctl->sc_action_file_handler, 0);
+    if (ctl->sc_action_addr == MAP_FAILED)
+    {
+        LSQ_ERROR("unable to map records.txt");
+        assert(0);
+    }
+    if ((ctl->sc_state_file_handler = open(STATE_FILE, O_RDWR, 0)) == -1)
+    {
+        LSQ_ERROR("unable to open state.txt");
+        assert(0);
+    }
+    ctl->sc_state_addr = (struct rl_state*)mmap(NULL, STATE_SHM_SIZE, PROT_WRITE, MAP_SHARED, ctl->sc_state_file_handler, 0);
+    if (ctl->sc_state_addr == MAP_FAILED)
+    {
+        LSQ_ERROR("unable to map state.txt");
+        assert(0);
+    }
+    if ((ctl->sc_records_file_handler = open(RECORD_FILE, O_RDWR, 0)) == -1)
+    {
+        LSQ_ERROR("unable to open records.txt");
+        assert(0);
+    }
+    ctl->sc_records_addr = (struct rl_record*)mmap(NULL, RECORD_SHM_SIZE, PROT_WRITE, MAP_SHARED, ctl->sc_records_file_handler, 0);
+    if (ctl->sc_records_addr == MAP_FAILED)
+    {
+        LSQ_ERROR("unable to map records.txt");
+        assert(0);
+    }
+    LSQ_ERROR("Map action_size %u, state_size %u, record_size %u, records_shared_size %u", ACTION_SHM_SIZE, STATE_SHM_SIZE, sizeof(struct rl_record), RECORD_SHM_SIZE);
     // 1 means run art, 0 means not
     ctl->sc_art_flag = 1;
     ctl->sc_all_retrans_packet_num = 0;
@@ -881,7 +909,14 @@ send_ctl_destroy_packet (struct lsquic_send_ctl *ctl,
         lsquic_packet_out_destroy(packet_out, ctl->sc_enpub,
                                             packet_out->po_path->np_peer_ctx);
     else
+    {
+        if (packet_out->po_state_in_lost)
+        {
+            free(packet_out->po_state_in_lost);
+            packet_out->po_state_in_lost = NULL;
+        }
         lsquic_malo_put(packet_out);
+    }
 }
 
 
@@ -1001,6 +1036,14 @@ send_ctl_record_loss (struct lsquic_send_ctl *ctl,
         loss_record->po_fake_loss_rec = packet_out->po_fake_loss_rec;
         loss_record->po_been_detect_loss = packet_out->po_been_detect_loss;
         loss_record->po_retrans_times = packet_out->po_retrans_times;
+        loss_record->po_need_retrans_number = packet_out->po_need_retrans_number;
+        if (packet_out->po_state_in_lost)
+        {
+            loss_record->po_state_in_lost = (struct rl_state*)malloc(sizeof(struct rl_state));
+            memcpy(loss_record->po_state_in_lost, packet_out->po_state_in_lost, sizeof(struct rl_state));
+        }
+        else
+            loss_record->po_state_in_lost = NULL;
         loss_record->po_sent = packet_out->po_sent;
         loss_record->po_sent_sz = packet_out_sent_sz(packet_out);
         loss_record->po_frame_types = packet_out->po_frame_types;
@@ -1242,6 +1285,55 @@ send_ctl_record_feedback_loss(struct lsquic_send_ctl *ctl)
     TAILQ_INSERT_TAIL(&ctl->sc_feedback_window, temp_feedback, af_next);
 }
 
+static struct rl_state*
+send_ctl_sample_packet_state(struct lsquic_send_ctl *ctl, struct lsquic_packet_out *packet_out, unsigned write_or_not)
+{
+    struct rl_state *network_state;
+
+    network_state = (struct rl_state *)malloc(sizeof(struct rl_state));
+    network_state->ack_rate = ctl->sc_ack_rate;
+    network_state->send_rate = ctl->sc_send_rate;
+    network_state->minrtt = lsquic_rtt_stats_get_min_rtt(&ctl->sc_conn_pub->rtt_stats);
+    network_state->srtt = lsquic_rtt_stats_get_srtt(&ctl->sc_conn_pub->rtt_stats);
+    network_state->lost_packet_number = ctl->sc_lost_packet_number;
+    network_state->inflight = ctl->sc_n_in_flight_all;
+    network_state->round = packet_out->po_retrans_times;
+    //TODO: write to state file
+    if (write_or_not)
+        write_state_to_shm(ctl, network_state);
+    LSQ_DEBUG("sample new state of packet %"PRIu64, packet_out->po_packno);
+    return network_state;
+}
+
+static void
+send_ctl_add_rl_record(struct lsquic_send_ctl *ctl, struct lsquic_packet_out *packet_out, unsigned ack_or_not, struct rl_state *next_state)
+{
+    struct rl_state *network_state;
+    struct rl_record *record;
+    unsigned round;
+    double reward;
+
+    round = packet_out->po_retrans_times;
+    if (round < 1 || !packet_out->po_state_in_lost || !next_state)
+        return;
+    if (ack_or_not)
+        reward = (double) 1.0/(round * packet_out->po_need_retrans_number);
+    else
+        reward = (double) -1.0 * (round / packet_out->po_need_retrans_number);
+    record = malloc(sizeof(struct rl_record));
+    memcpy(&record->state, packet_out->po_state_in_lost, sizeof(struct rl_state));
+    record->dup_number = packet_out->po_need_retrans_number;
+    record->ack_or_not = ack_or_not;
+    record->reward = reward;
+    memcpy(&record->next_state, next_state, sizeof(struct rl_state));
+    insert_records_to_shm(ctl, record, ctl->sc_record_index);
+    ctl->sc_record_index = (++ctl->sc_record_index) % RECORD_MAX_INDEX;
+    if (packet_out->po_state_in_lost)
+        free(packet_out->po_state_in_lost);
+    packet_out->po_state_in_lost = NULL;
+    free(record);
+}
+
 /* Return true if losses were detected, false otherwise */
 static int
 send_ctl_detect_losses (struct lsquic_send_ctl *ctl, enum packnum_space pns,
@@ -1249,6 +1341,8 @@ send_ctl_detect_losses (struct lsquic_send_ctl *ctl, enum packnum_space pns,
 {
     struct lsquic_packet_out *packet_out, *next, *loss_record;
     lsquic_packno_t largest_retx_packno, largest_lost_packno;
+    struct rl_state *next_state;
+    struct rl_record *record;
 
     largest_retx_packno = largest_retx_packet_number(ctl, pns);
     largest_lost_packno = 0;
@@ -1291,6 +1385,11 @@ send_ctl_detect_losses (struct lsquic_send_ctl *ctl, enum packnum_space pns,
                 {
                     // only work one time
                     packet_out->po_been_detect_loss = 1;
+                    // sample new state
+                    next_state = send_ctl_sample_packet_state(ctl, packet_out, 1);
+                    if (packet_out->po_retrans_times > 0)
+                        send_ctl_add_rl_record(ctl, packet_out, 0, next_state);
+                    packet_out->po_state_in_lost = next_state;
                     loss_record = send_ctl_handle_regular_lost_packet(ctl,
                                                             packet_out, &next);
                     if (loss_record)
@@ -1327,6 +1426,11 @@ send_ctl_detect_losses (struct lsquic_send_ctl *ctl, enum packnum_space pns,
             {
                 // only work one time
                 packet_out->po_been_detect_loss = 1;
+                // sample new state
+                next_state = send_ctl_sample_packet_state(ctl, packet_out, 1);
+                if (packet_out->po_retrans_times > 0)
+                    send_ctl_add_rl_record(ctl, packet_out, 0, next_state);
+                packet_out->po_state_in_lost = next_state;
                 (void) send_ctl_handle_lost_packet(ctl, packet_out, &next);
             }
             continue;
@@ -1354,6 +1458,11 @@ send_ctl_detect_losses (struct lsquic_send_ctl *ctl, enum packnum_space pns,
             {
                 // only work one time
                 packet_out->po_been_detect_loss = 1;
+                // sample new state
+                next_state = send_ctl_sample_packet_state(ctl, packet_out, 1);
+                if (packet_out->po_retrans_times > 0)
+                    send_ctl_add_rl_record(ctl, packet_out, 0, next_state);
+                packet_out->po_state_in_lost = next_state;
                 (void) send_ctl_handle_lost_packet(ctl, packet_out, &next);
             }
             continue;
@@ -1429,6 +1538,7 @@ lsquic_send_ctl_got_ack (lsquic_send_ctl_t *ctl,
     enum packnum_space pns;
     unsigned ecn_total_acked, ecn_ce_cnt, one_rtt_cnt;
     const struct bwp_state *state, *latest_state;
+    struct rl_state *next_state;
 
     pns = acki->pns;
     ctl->sc_flags |= SC_ACK_RECV_INIT << pns;
@@ -1555,6 +1665,8 @@ lsquic_send_ctl_got_ack (lsquic_send_ctl_t *ctl,
                 lsquic_packet_out_ack_streams(packet_out);
                 LSQ_DEBUG("acking via regular record %"PRIu64,
                                                         packet_out->po_packno);
+                next_state = send_ctl_sample_packet_state(ctl, packet_out, 0);
+                send_ctl_add_rl_record(ctl, packet_out, 1, next_state);
             }
             else if (packet_out->po_flags & PO_LOSS_REC)
             {
@@ -1569,6 +1681,8 @@ lsquic_send_ctl_got_ack (lsquic_send_ctl_t *ctl,
                                                                     po_next);
                 LSQ_DEBUG("acking via loss record %"PRIu64,
                                                         packet_out->po_packno);
+                next_state = send_ctl_sample_packet_state(ctl, packet_out, 0);
+                send_ctl_add_rl_record(ctl, packet_out, 1, next_state);
                 send_ctl_maybe_increase_reord_thresh(ctl, packet_out,
                                                             prev_largest_acked);
 #if LSQUIC_CONN_STATS
@@ -1879,6 +1993,15 @@ lsquic_send_ctl_cleanup (lsquic_send_ctl_t *ctl)
         ctl->sc_stats.n_delayed);
 #endif
     free(ctl->sc_token);
+    LSQ_ERROR("DEBUG: Network Status: Unacked_all: %u, Lost_queue_length: %u, All_retrans_packets: %"PRIu64, 
+            ctl->sc_bytes_unacked_all, ctl->sc_lost_packet_number, ctl->sc_all_retrans_packet_num);
+    munmap(ctl->sc_action_addr, ACTION_SHM_SIZE);
+    munmap(ctl->sc_state_addr, STATE_SHM_SIZE);
+    munmap(ctl->sc_records_addr, RECORD_SHM_SIZE);
+    close(ctl->sc_action_file_handler);
+    close(ctl->sc_state_file_handler);
+    close(ctl->sc_records_file_handler);
+    LSQ_ERROR("free all shared memory");
 }
 
 

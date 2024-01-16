@@ -82,7 +82,13 @@ typedef struct lsquic_send_ctl {
     unsigned                        sc_lost_packet_number;
     unsigned                        sc_largest_feedbback_window;
     unsigned                        sc_feedback_window_size;
-    void                           *sc_shm_addr;
+    unsigned                        sc_record_index;
+    void                           *sc_action_addr;
+    int                             sc_action_file_handler;
+    void                           *sc_state_addr;
+    int                             sc_state_file_handler;
+    void                           *sc_records_addr;
+    int                             sc_records_file_handler;
     unsigned                        sc_rounds_map[MAX_ROUND_BOUND];
     unsigned long                   sc_all_retrans_packet_num;
     struct lsquic_packet_out       *sc_pre_dup_packet;

@@ -278,6 +278,7 @@ lsquic_packet_out_new (struct lsquic_mm *mm, struct malo *malo, int use_cid,
     packet_out->po_need_retrans_number = 0;
     packet_out->po_fake_loss_rec = 0;
     packet_out->po_feedback_recorded = 0;
+    packet_out->po_state_in_lost = NULL;
     return packet_out;
 }
 
@@ -303,6 +304,8 @@ lsquic_packet_out_destroy (lsquic_packet_out_t *packet_out,
         free(packet_out->po_nonce);
     if (packet_out->po_bwp_state)
         lsquic_malo_put(packet_out->po_bwp_state);
+    if (packet_out->po_state_in_lost)
+        free(packet_out->po_state_in_lost);
     lsquic_mm_put_packet_out(&enpub->enp_mm, packet_out);
 }
 

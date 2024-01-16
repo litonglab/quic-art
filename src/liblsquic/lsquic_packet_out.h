@@ -16,6 +16,7 @@ struct lsquic_stream;
 struct network_path;
 struct parse_funcs;
 struct bwp_state;
+struct rl_state;
 
 /* Each frame_rec is associated with one packet_out.  packet_out can have
  * zero or more frame_rec structures.  frame_rec keeps a pointer to a stream
@@ -86,6 +87,7 @@ typedef struct lsquic_packet_out
     unsigned short     po_been_detect_loss;
     unsigned short     po_fake_loss_rec;
     unsigned short     po_feedback_recorded;
+    struct rl_state   *po_state_in_lost;
     struct lsquic_packet_out 
                       *po_pre_packet;
 
