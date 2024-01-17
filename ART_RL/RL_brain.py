@@ -10,6 +10,7 @@ Tensorflow: 1.0
 gym: 0.7.3
 """
 
+import os
 import numpy as np
 import pandas as pd
 import tensorflow.compat.v1 as tf
@@ -17,6 +18,8 @@ tf.disable_v2_behavior()
 
 np.random.seed(1)
 tf.set_random_seed(1)
+
+SAVE_PATH = "./dqn/model"
 
 
 # Deep Q Network off-policy
@@ -58,6 +61,7 @@ class DeepQNetwork:
         self.replace_target_op = [tf.assign(t, e) for t, e in zip(t_params, e_params)]
 
         self.sess = tf.Session()
+        saver = tf.train.Saver()
 
         if output_graph:
             # $ tensorboard --logdir=logs
@@ -66,6 +70,23 @@ class DeepQNetwork:
 
         self.sess.run(tf.global_variables_initializer())
         self.cost_his = []
+
+        # all_v = [v.name for v in tf.trainable_variables()]
+        # values = self.sess.run(all_v)
+        # for k,v in zip(all_v, values):
+        #     print("Variable: ", k)
+        #     print("Shape: ", v.shape)
+        #     print(v)
+
+        ckpt = tf.train.get_checkpoint_state(SAVE_PATH)
+        if ckpt and ckpt.model_checkpoint_path:
+            saver.restore(self.sess, ckpt.model_checkpoint_path)
+            print("DQN Model is loaded.")
+        # values = self.sess.run(all_v)
+        # for k,v in zip(all_v, values):
+        #     print("Variable: ", k)
+        #     print("Shape: ", v.shape)
+        #     print(v)
 
     def _build_net(self):
         # ------------------ build evaluate_net ------------------
@@ -135,6 +156,7 @@ class DeepQNetwork:
             action = np.argmax(actions_value)
         else:
             action = np.random.randint(0, self.n_actions)
+        # print("DQN choose action: ", action)
         return action
 
     def learn(self):
@@ -159,10 +181,12 @@ class DeepQNetwork:
 
         batch_index = np.arange(self.batch_size, dtype=np.int32)
         # action
-        eval_act_index = batch_memory[:, self.n_features].astype(int)
+        eval_act = batch_memory[:, self.n_features].astype(int)
+        eval_act_index = eval_act - 1
         # reward
         reward = batch_memory[:, self.n_features + 2]
 
+        # print(f"batch index: {batch_index}, eva_act_index: {eval_act_index}, q_next: {q_next}")
         q_target[batch_index, eval_act_index] = reward + self.gamma * np.max(q_next, axis=1)
 
         """
@@ -212,7 +236,10 @@ class DeepQNetwork:
         plt.show()
 
     def save_net(self):
+        if not os.path.exists(SAVE_PATH):
+            os.makedirs(SAVE_PATH)
+        path = SAVE_PATH + "/ART_RL.ckpt"
         saver = tf.train.Saver()
-        save_path = saver.save(self.sess, "./dqn/model/ART_RL.ckpt")
+        save_path = saver.save(self.sess, path)
         print("Save model to path: ", save_path)
 

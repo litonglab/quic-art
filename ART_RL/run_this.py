@@ -13,7 +13,7 @@ def run_maze():
             action = RL.choose_action(observation)
 
             # write action to shared memory
-
+            env.write_action(action)
             # RL take action and lsquic to step and generate next observation and reward
             # observation_, reward, done = env.step(action)
             # RL.store_transition(observation, action, reward, observation_)
@@ -25,8 +25,12 @@ def run_maze():
             # observation = observation_
 
             step += 1
+
+            if (step % 1000000 == 0):
+                RL.save_net()
         except KeyboardInterrupt:
             RL.save_net()
+            return
 
 if __name__ == "__main__":
     # maze game

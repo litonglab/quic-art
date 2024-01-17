@@ -75,9 +75,10 @@ class ART_RL():
         return np.array(records)
         # return records
 
-    def write_action(self, action):
+    def write_action(self, action_index):
         self.action_mm.seek(0)
-        print(f'{action} is been writen to action_file, its type is: {type(action)}')
+        action = self.action_space[action_index].to_bytes(4, byteorder='little')[:1]
+        # print(f'{action} is been writen to action_file, its type is: {type(action)}')
         self.action_mm.write(action)
 
 # test = ART_RL()
