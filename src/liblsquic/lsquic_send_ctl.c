@@ -2692,7 +2692,7 @@ lsquic_send_ctl_reschedule_packets (lsquic_send_ctl_t *ctl)
         packet_out->po_retrans_no = old_packno;
         lsquic_send_ctl_scheduled_one(ctl, packet_out);
         LSQ_ERROR("ART detect %"PRIu64" has been retransmit %u times, new packno is %"PRIu64" now packet number is %u", old_packno, packet_out->po_retrans_times, packet_out->po_packno, packet_out->po_retrans_packet_number);
-        if((ctl->sc_art_flag && packet_out->po_frame_types != QUIC_FTBIT_PADDING) && (packet_out->po_frame_types & (1 << QUIC_FRAME_STREAM)))
+        if(((ctl->sc_art_flag || ctl->sc_multi_arm_flag) && packet_out->po_frame_types != QUIC_FTBIT_PADDING) && (packet_out->po_frame_types & (1 << QUIC_FRAME_STREAM)))
         {
             if (!lsquic_alarmset_is_set(ctl->sc_alset, AL_ART_SCHE))
             {
