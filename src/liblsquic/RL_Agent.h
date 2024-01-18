@@ -44,7 +44,7 @@ typedef struct rl_record
     struct rl_state next_state;
 }rl_record_t;
 
-void insert_records_to_shm(struct lsquic_send_ctl *ctl, struct rl_record *records, unsigned offset);
+void insert_records_to_shm(struct lsquic_send_ctl *ctl, struct rl_record *records, unsigned offset, struct lsquic_packet_out *packet_out);
 unsigned get_action(struct lsquic_send_ctl *ctl);
 void write_state_to_shm(struct lsquic_send_ctl *ctl, struct rl_state *state);
 

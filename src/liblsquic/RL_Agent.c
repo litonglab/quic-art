@@ -62,12 +62,12 @@ unsigned get_action(struct lsquic_send_ctl *ctl)
     return action;
 }
 
-void insert_records_to_shm(struct lsquic_send_ctl *ctl, struct rl_record *records, unsigned index)
+void insert_records_to_shm(struct lsquic_send_ctl *ctl, struct rl_record *records, unsigned index, struct lsquic_packet_out *packet_out)
 {
     // if (index > RECORD_MAX_INDEX)
     //     index = index % RECORD_MAX_INDEX;
-    LSQ_ERROR("write record to index: %u, addr: %p: send_rate: %"PRIu64", ack_rate: %"PRIu64", minrtt: %"PRIu64", srtt: %"PRIu64", lost_number: %u, inflight: %u, round: %u, dup_number: %u, ack_or_not: %u, reward: %lf, next_send_rate: %"PRIu64", next_ack_rate: %"PRIu64", next_minrtt: %"PRIu64", next_srtt: %"PRIu64", next_lost_number: %u, next_inflight: %u, next_round: %u",
-                                    index, ctl->sc_records_addr+index*sizeof(struct rl_record), records->state.send_rate, records->state.ack_rate, records->state.minrtt, records->state.srtt, records->state.lost_packet_number, records->state.inflight, records->state.round, records->dup_number, records->ack_or_not, records->reward, records->next_state.send_rate, records->next_state.ack_rate, records->next_state.minrtt, records->next_state.srtt, records->next_state.lost_packet_number, records->next_state.inflight, records->next_state.round);
+    LSQ_ERROR("write record to index: %u, addr: %p: send_rate: %"PRIu64", ack_rate: %"PRIu64", minrtt: %"PRIu64", srtt: %"PRIu64", lost_number: %u, inflight: %u, round: %u, dup_number: %u, ack_or_not: %u, reward: %lf, next_send_rate: %"PRIu64", next_ack_rate: %"PRIu64", next_minrtt: %"PRIu64", next_srtt: %"PRIu64", next_lost_number: %u, next_inflight: %u, next_round: %u, packno: %"PRIu64", pack_retransno: %"PRIu64,
+                                    index, ctl->sc_records_addr+index*sizeof(struct rl_record), records->state.send_rate, records->state.ack_rate, records->state.minrtt, records->state.srtt, records->state.lost_packet_number, records->state.inflight, records->state.round, records->dup_number, records->ack_or_not, records->reward, records->next_state.send_rate, records->next_state.ack_rate, records->next_state.minrtt, records->next_state.srtt, records->next_state.lost_packet_number, records->next_state.inflight, records->next_state.round, packet_out->po_packno, packet_out->po_retrans_no);
     memcpy(ctl->sc_records_addr+index*sizeof(struct rl_record), records, sizeof(struct rl_record));
 }
 

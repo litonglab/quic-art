@@ -1319,14 +1319,14 @@ send_ctl_add_rl_record(struct lsquic_send_ctl *ctl, struct lsquic_packet_out *pa
     if (ack_or_not)
         reward = (double) 1.0/(round * packet_out->po_need_retrans_number);
     else
-        reward = (double) -1.0 * (round / packet_out->po_need_retrans_number);
+        reward = (double) -1.01 * (round * packet_out->po_need_retrans_number);
     record = malloc(sizeof(struct rl_record));
     memcpy(&record->state, packet_out->po_state_in_lost, sizeof(struct rl_state));
     record->dup_number = packet_out->po_need_retrans_number;
     record->ack_or_not = ack_or_not;
     record->reward = reward;
     memcpy(&record->next_state, next_state, sizeof(struct rl_state));
-    insert_records_to_shm(ctl, record, ctl->sc_record_index);
+    insert_records_to_shm(ctl, record, ctl->sc_record_index, packet_out);
     ctl->sc_record_index = (++ctl->sc_record_index) % RECORD_MAX_INDEX;
     if (packet_out->po_state_in_lost)
         free(packet_out->po_state_in_lost);
