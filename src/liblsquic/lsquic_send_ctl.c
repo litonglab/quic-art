@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/queue.h>
+#include <stdio.h>
 
 #include <openssl/rand.h>
 
@@ -383,7 +384,23 @@ lsquic_send_ctl_init (lsquic_send_ctl_t *ctl, struct lsquic_alarmset *alset,
     ctl->sc_multi_arm_flag = 1;
     assert(ctl->sc_multi_arm_flag != ctl->sc_art_flag);
     ctl->sc_all_arms = malloc(NUM_OF_ARMS * sizeof(struct arm_of_bandit));
-    memset(ctl->sc_all_arms, 0, NUM_OF_ARMS * sizeof(struct arm_of_bandit));
+    // config file exists
+    if (access(ARM_SAVE_PATH, 0) == 0)
+    {
+        FILE *arm_conf;
+        arm_conf = fopen(ARM_SAVE_PATH, "r");
+        if (arm_conf != NULL)
+        {
+            fread(ctl->sc_all_arms, NUM_OF_ARMS, sizeof(struct arm_of_bandit), arm_conf);
+            LSQ_ERROR("Arm info from config file:");
+            for (unsigned temp_arm = 0; temp_arm < NUM_OF_ARMS; temp_arm++)
+                LSQ_ERROR("   %uth arm: use_number: %u, expect: %f", temp_arm,
+                    ctl->sc_all_arms[temp_arm].use_number, ctl->sc_all_arms[temp_arm].expect);
+            fclose(arm_conf);
+        }
+    }
+    else
+        memset(ctl->sc_all_arms, 0, NUM_OF_ARMS * sizeof(struct arm_of_bandit));
     for(unsigned temp = 0; temp < MAX_ROUND_BOUND; temp++)
         ctl->sc_rounds_map[temp] = 2*temp - 1;
     send_ctl_pick_initial_packno(ctl);
@@ -1147,7 +1164,8 @@ send_ctl_handle_regular_lost_packet (struct lsquic_send_ctl *ctl,
                 if (ctl->sc_multi_arm_flag)
                 {
                     //arm_index is 0-9, but arm is 1-10
-                    unsigned dup_number = select_arm_with_epsilon_greedy_policy(ctl) + 1;
+                    //unsigned dup_number = select_arm_with_epsilon_greedy_policy(ctl) + 1;
+                    unsigned dup_number = select_arm_with_ucb_policy(ctl) + 1;
                     packet_out->po_need_retrans_number = dup_number > 0 ? dup_number : 1;
                     packet_out->po_fake_loss_rec = 1;
                     delay = lsquic_packet_out_schedule_time(packet_out, 1, lsquic_time_now());
@@ -1893,6 +1911,14 @@ lsquic_send_ctl_cleanup (lsquic_send_ctl_t *ctl)
     free(ctl->sc_token);
     LSQ_ERROR("DEBUG: Network Status: Unacked_all: %u, Lost_queue_length: %u, All_retrans_packets: %"PRIu64, 
             ctl->sc_bytes_unacked_all, ctl->sc_lost_packet_number, ctl->sc_all_retrans_packet_num);
+    FILE *arm_conf;
+    arm_conf = fopen(ARM_SAVE_PATH, "wb");
+    if (arm_conf != NULL)
+    {
+        fwrite(ctl->sc_all_arms, sizeof(struct arm_of_bandit), NUM_OF_ARMS, arm_conf);
+        LSQ_ERROR("Arm info has been writen to config file.");
+        fclose(arm_conf);
+    }
     LSQ_ERROR("Arm info:");
     for (unsigned temp_arm = 0; temp_arm < NUM_OF_ARMS; temp_arm++)
         LSQ_ERROR("   %uth arm: use_number: %u, expect: %f", temp_arm,
