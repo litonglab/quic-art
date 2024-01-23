@@ -2,7 +2,7 @@ import csv
 import os
 import re
 
-FILE_PATH = "/home/ubuntu/test"
+FILE_PATH = "/home/ubuntu/multi-armed-bandit-experiments"
 
 
 def analyze_line(line, lost_dict, recovery_dict):
@@ -21,7 +21,9 @@ def analyze_line(line, lost_dict, recovery_dict):
         packno = numbers[-2]
         temp_round = numbers[-6]
         receive_time = numbers[-8]
-        recovery_time = int(receive_time) - int(lost_dict[lost_number])
+        recovery_time = None
+        if lost_number in lost_dict.keys():
+            recovery_time = int(receive_time) - int(lost_dict[lost_number])
         if lost_number not in recovery_dict.keys():
             recovery_dict[lost_number] = []
         recovery_dict[lost_number].append(recovery_time)
