@@ -1319,7 +1319,7 @@ send_ctl_add_rl_record(struct lsquic_send_ctl *ctl, struct lsquic_packet_out *pa
     if (ack_or_not)
         reward = (double) 1.0/(round * packet_out->po_need_retrans_number);
     else
-        reward = (double) -1.01 * (round * packet_out->po_need_retrans_number);
+        reward = (double) -1.05 * (round * packet_out->po_need_retrans_number);
     record = malloc(sizeof(struct rl_record));
     memcpy(&record->state, packet_out->po_state_in_lost, sizeof(struct rl_state));
     record->dup_number = packet_out->po_need_retrans_number;
@@ -1385,6 +1385,7 @@ send_ctl_detect_losses (struct lsquic_send_ctl *ctl, enum packnum_space pns,
                 {
                     // only work one time
                     packet_out->po_been_detect_loss = 1;
+                    LSQ_ERROR("ART detect packet %"PRIu64" is lost, time is: %"PRIu64, packet_out->po_packno, time);
                     // sample new state
                     next_state = send_ctl_sample_packet_state(ctl, packet_out, 1);
                     if (packet_out->po_retrans_times > 0)
@@ -1426,6 +1427,7 @@ send_ctl_detect_losses (struct lsquic_send_ctl *ctl, enum packnum_space pns,
             {
                 // only work one time
                 packet_out->po_been_detect_loss = 1;
+                LSQ_ERROR("ART detect packet %"PRIu64" is lost, time is: %"PRIu64, packet_out->po_packno, time);
                 // sample new state
                 next_state = send_ctl_sample_packet_state(ctl, packet_out, 1);
                 if (packet_out->po_retrans_times > 0)
@@ -1458,6 +1460,7 @@ send_ctl_detect_losses (struct lsquic_send_ctl *ctl, enum packnum_space pns,
             {
                 // only work one time
                 packet_out->po_been_detect_loss = 1;
+                LSQ_ERROR("ART detect packet %"PRIu64" is lost, time is: %"PRIu64, packet_out->po_packno, time);
                 // sample new state
                 next_state = send_ctl_sample_packet_state(ctl, packet_out, 1);
                 if (packet_out->po_retrans_times > 0)
