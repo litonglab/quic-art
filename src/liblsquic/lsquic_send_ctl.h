@@ -11,6 +11,7 @@
 #endif
 
 #define MAX_ROUND_BOUND  20
+#define MAX_FEEDBACK_WINDOW_SIZE  10
 
 TAILQ_HEAD(lsquic_packets_tailq, lsquic_packet_out);
 TAILQ_HEAD(lsquic_feedback_tailq, lsquic_art_feedback);
@@ -80,7 +81,7 @@ typedef struct lsquic_send_ctl {
     lsquic_time_t                   sc_remained_min_rtt_time;
     unsigned                        sc_remained_dup_num;
     unsigned                        sc_lost_packet_number;
-    unsigned                        sc_largest_feedbback_window;
+    unsigned                        sc_largest_feedback_window;
     unsigned                        sc_feedback_window_size;
     unsigned                        sc_rounds_map[MAX_ROUND_BOUND];
     unsigned long                   sc_all_retrans_packet_num;

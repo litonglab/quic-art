@@ -372,7 +372,7 @@ lsquic_send_ctl_init (lsquic_send_ctl_t *ctl, struct lsquic_alarmset *alset,
     // 1 means run art, 0 means not
     ctl->sc_art_flag = 1;
     ctl->sc_all_retrans_packet_num = 0;
-    ctl->sc_largest_feedbback_window = 10;
+    ctl->sc_largest_feedback_window = MAX_FEEDBACK_WINDOW_SIZE;
     ctl->sc_feedback_window_size = 0;
     ctl->sc_send_rate = 0;
     ctl->sc_ack_rate = 0;
@@ -1215,7 +1215,7 @@ send_ctl_record_feedback_loss(struct lsquic_send_ctl *ctl)
 {
     struct lsquic_art_feedback *temp_feedback;
 
-    if (ctl->sc_feedback_window_size >= ctl->sc_largest_feedbback_window)
+    if (ctl->sc_feedback_window_size >= ctl->sc_largest_feedback_window)
     {
         temp_feedback = TAILQ_FIRST(&ctl->sc_feedback_window);
         TAILQ_REMOVE(&ctl->sc_feedback_window, temp_feedback, af_next);
@@ -1521,7 +1521,7 @@ lsquic_send_ctl_got_ack (lsquic_send_ctl_t *ctl,
             if(packet_out->po_fake_loss_rec == 1)
             {
                 struct lsquic_art_feedback *temp_feedback;
-                if (ctl->sc_feedback_window_size >= ctl->sc_largest_feedbback_window)
+                if (ctl->sc_feedback_window_size >= ctl->sc_largest_feedback_window)
                 {
                     temp_feedback = TAILQ_FIRST(&ctl->sc_feedback_window);
                     TAILQ_REMOVE(&ctl->sc_feedback_window, temp_feedback, af_next);
