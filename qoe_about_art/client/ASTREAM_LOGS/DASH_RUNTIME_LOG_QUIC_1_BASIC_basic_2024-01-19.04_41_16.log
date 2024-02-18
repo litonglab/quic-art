@@ -1,0 +1,15 @@
+2024-01-19 04:41:16,546 - dash_client.py:747 - INFO - Downloading MPD file http://127.0.0.1:12345/BigBuckBunny_1s_simple_2014_05_09.mpd
+2024-01-19 04:41:17,061 - read_mpd.py:151 - INFO - Reading the MPD file
+2024-01-19 04:41:17,062 - read_mpd.py:187 - INFO - Retrieving Media
+2024-01-19 04:41:17,062 - dash_client.py:765 - INFO - The DASH media has 20 video representations
+2024-01-19 04:41:17,062 - dash_client.py:775 - CRITICAL - Started Basic-DASH Playback
+2024-01-19 04:41:17,062 - dash_buffer.py:23 - INFO - Initializing the Buffer
+2024-01-19 04:41:17,062 - dash_buffer.py:56 - INFO - VideoLength=595.46,segmentDuration=1,MaxBufferSize=595.46,InitialBuffer(secs)=1,BufferAlph(secs)=5,BufferBeta(secs)=10
+2024-01-19 04:41:17,062 - dash_buffer.py:64 - INFO - Changing state from INITIALIZED to INITIAL_BUFFERING at 0 Playback time 
+2024-01-19 04:41:17,063 - dash_buffer.py:271 - INFO - BufferStats: EpochTime=0,CurrentPlaybackTime=0,CurrentBufferSize=0,CurrentPlaybackState=INITIAL_BUFFERING,Action=Starting,Bitrate=0
+2024-01-19 04:41:17,064 - dash_buffer.py:234 - INFO - Starting the Player
+2024-01-19 04:41:17,064 - dash_buffer.py:271 - INFO - BufferStats: EpochTime=0,CurrentPlaybackTime=0,CurrentBufferSize=0,CurrentPlaybackState=INITIAL_BUFFERING,Action=Starting,Bitrate=0
+2024-01-19 04:41:17,065 - dash_client.py:295 - INFO - The segments are stored in URLLIB_
+2024-01-19 04:41:17,068 - dash_client.py:366 - INFO - *************** segment_number:1*********************
+2024-01-19 04:41:17,194 - dash_client.py:367 - INFO -  BASIC: Processing the segment 1
+2024-01-19 04:41:17,195 - dash_client.py:437 - INFO - BASIC: Segment URL = http://127.0.0.1:12345/bunny_46980bps/BigBuckBunny_1s_init.mp4

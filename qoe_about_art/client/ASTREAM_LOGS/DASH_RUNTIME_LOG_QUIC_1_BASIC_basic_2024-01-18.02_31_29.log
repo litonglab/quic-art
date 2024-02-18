@@ -1,0 +1,2 @@
+2024-01-18 02:31:29,732 - dash_client.py:739 - INFO - Downloading MPD file http://127.0.0.1:12345/slipstream-bbb.mpd
+2024-01-18 02:31:35,829 - read_mpd.py:117 - INFO - Reading the MPD file

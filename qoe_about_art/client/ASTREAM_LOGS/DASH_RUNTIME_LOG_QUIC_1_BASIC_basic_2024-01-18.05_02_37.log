@@ -1,0 +1,17 @@
+2024-01-18 05:02:37,126 - dash_client.py:746 - INFO - Downloading MPD file http://127.0.0.1:12345/BigBuckBunny_1s_simple_2014_05_09.mpd
+2024-01-18 05:02:47,160 - read_mpd.py:151 - INFO - Reading the MPD file
+2024-01-18 05:02:47,232 - read_mpd.py:187 - INFO - Retrieving Media
+2024-01-18 05:02:47,233 - dash_client.py:764 - INFO - The DASH media has 20 video representations
+2024-01-18 05:02:47,233 - dash_client.py:774 - CRITICAL - Started Basic-DASH Playback
+2024-01-18 05:02:47,233 - dash_buffer.py:23 - INFO - Initializing the Buffer
+2024-01-18 05:02:47,233 - dash_buffer.py:56 - INFO - VideoLength=595.46,segmentDuration=1,MaxBufferSize=595.46,InitialBuffer(secs)=1,BufferAlph(secs)=5,BufferBeta(secs)=10
+2024-01-18 05:02:47,233 - dash_buffer.py:64 - INFO - Changing state from INITIALIZED to INITIAL_BUFFERING at 0 Playback time 
+2024-01-18 05:02:47,234 - dash_buffer.py:271 - INFO - BufferStats: EpochTime=0,CurrentPlaybackTime=0,CurrentBufferSize=0,CurrentPlaybackState=INITIAL_BUFFERING,Action=Starting,Bitrate=0
+2024-01-18 05:02:47,234 - dash_buffer.py:234 - INFO - Starting the Player
+2024-01-18 05:02:47,234 - dash_buffer.py:271 - INFO - BufferStats: EpochTime=0,CurrentPlaybackTime=0,CurrentBufferSize=0,CurrentPlaybackState=INITIAL_BUFFERING,Action=Starting,Bitrate=0
+2024-01-18 05:02:47,234 - dash_client.py:294 - INFO - The segments are stored in URLLIB_
+2024-01-18 05:02:47,236 - dash_buffer.py:77 - INFO - Initialized player with video length 595.46
+2024-01-18 05:02:47,277 - dash_client.py:365 - INFO - *************** segment_number:1*********************
+2024-01-18 05:02:47,278 - dash_client.py:366 - INFO -  BASIC: Processing the segment 1
+2024-01-18 05:02:47,279 - dash_client.py:436 - INFO - BASIC: Segment URL = http://127.0.0.1:12345/bunny_46980bps/BigBuckBunny_1s_init.mp4
+2024-01-18 05:02:47,288 - dash_client.py:458 - ERROR - Unable to save segment [Errno 32] Broken pipe

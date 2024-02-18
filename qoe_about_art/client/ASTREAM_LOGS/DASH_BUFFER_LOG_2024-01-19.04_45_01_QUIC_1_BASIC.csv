@@ -1,0 +1,7 @@
+EpochTime;CurrentPlaybackTime;CurrentBufferSize;CurrentPlaybackState;Action;Bitrate
+0;0;0;INITIAL_BUFFERING;Starting;0
+0;0;0;INITIAL_BUFFERING;Starting;0
+0;0;1;INITIAL_BUFFERING;Writing;46980
+3;0;1;PLAY;InitialBuffering-Play;0
+4;0;0;PLAY;StillPlaying;46980
+1005;1;0;BUFFERING;Play-Buffering;0

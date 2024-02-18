@@ -370,7 +370,7 @@ lsquic_send_ctl_init (lsquic_send_ctl_t *ctl, struct lsquic_alarmset *alset,
     ctl->sc_remained_dup_num = 0;
     ctl->sc_pre_dup_packet = NULL;
     // 1 means run art, 0 means not
-    ctl->sc_art_flag = 1;
+    ctl->sc_art_flag = 0;
     ctl->sc_all_retrans_packet_num = 0;
     ctl->sc_largest_feedbback_window = 10;
     ctl->sc_feedback_window_size = 0;
@@ -2664,7 +2664,8 @@ lsquic_send_ctl_reschedule_packets (lsquic_send_ctl_t *ctl)
         packet_out->po_retrans_no = old_packno;
         lsquic_send_ctl_scheduled_one(ctl, packet_out);
         LSQ_DEBUG("ART detect %"PRIu64" has been retransmit %u times, new packno is %"PRIu64" now packet number is %u", old_packno, packet_out->po_retrans_times, packet_out->po_packno, packet_out->po_retrans_packet_number);
-        if((ctl->sc_art_flag && packet_out->po_frame_types != QUIC_FTBIT_PADDING) && (packet_out->po_frame_types & (1 << QUIC_FRAME_STREAM)))
+        // if((ctl->sc_art_flag && packet_out->po_frame_types != QUIC_FTBIT_PADDING) && (packet_out->po_frame_types & (1 << QUIC_FRAME_STREAM)))
+        if((packet_out->po_frame_types != QUIC_FTBIT_PADDING) && (packet_out->po_frame_types & (1 << QUIC_FRAME_STREAM)))
         {
             if (!lsquic_alarmset_is_set(ctl->sc_alset, AL_ART_SCHE))
             {

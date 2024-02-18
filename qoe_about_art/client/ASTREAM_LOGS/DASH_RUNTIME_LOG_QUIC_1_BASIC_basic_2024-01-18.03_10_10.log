@@ -1,0 +1,2 @@
+2024-01-18 03:10:10,266 - dash_client.py:739 - INFO - Downloading MPD file http://127.0.0.1:12345/BigBuckBunny_1s_simple_2014_05_09.mpd
+2024-01-18 03:10:10,778 - read_mpd.py:117 - INFO - Reading the MPD file

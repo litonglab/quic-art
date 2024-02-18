@@ -1,0 +1,36 @@
+2024-01-19 04:45:06,646 - dash_client.py:750 - INFO - Downloading MPD file http://127.0.0.1:12345/BigBuckBunny_1s_simple_2014_05_09.mpd
+2024-01-19 04:45:07,182 - read_mpd.py:151 - INFO - Reading the MPD file
+2024-01-19 04:45:07,183 - read_mpd.py:187 - INFO - Retrieving Media
+2024-01-19 04:45:07,183 - dash_client.py:768 - INFO - The DASH media has 20 video representations
+2024-01-19 04:45:07,183 - dash_client.py:778 - CRITICAL - Started Basic-DASH Playback
+2024-01-19 04:45:07,183 - dash_buffer.py:23 - INFO - Initializing the Buffer
+2024-01-19 04:45:07,183 - dash_buffer.py:56 - INFO - VideoLength=595.46,segmentDuration=1,MaxBufferSize=595.46,InitialBuffer(secs)=1,BufferAlph(secs)=5,BufferBeta(secs)=10
+2024-01-19 04:45:07,183 - dash_buffer.py:64 - INFO - Changing state from INITIALIZED to INITIAL_BUFFERING at 0 Playback time 
+2024-01-19 04:45:07,183 - dash_buffer.py:271 - INFO - BufferStats: EpochTime=0,CurrentPlaybackTime=0,CurrentBufferSize=0,CurrentPlaybackState=INITIAL_BUFFERING,Action=Starting,Bitrate=0
+2024-01-19 04:45:07,183 - dash_buffer.py:234 - INFO - Starting the Player
+2024-01-19 04:45:07,184 - dash_buffer.py:271 - INFO - BufferStats: EpochTime=0,CurrentPlaybackTime=0,CurrentBufferSize=0,CurrentPlaybackState=INITIAL_BUFFERING,Action=Starting,Bitrate=0
+2024-01-19 04:45:07,184 - dash_client.py:298 - INFO - The segments are stored in URLLIB_
+2024-01-19 04:45:07,185 - dash_buffer.py:77 - INFO - Initialized player with video length 595.46
+2024-01-19 04:45:07,189 - dash_client.py:369 - INFO - *************** segment_number:1*********************
+2024-01-19 04:45:07,189 - dash_client.py:370 - INFO -  BASIC: Processing the segment 1
+2024-01-19 04:45:07,189 - dash_client.py:440 - INFO - BASIC: Segment URL = http://127.0.0.1:12345/bunny_46980bps/BigBuckBunny_1s_init.mp4
+2024-01-19 04:45:07,697 - dash_client.py:454 - INFO - BASIC: Downloaded segment http://127.0.0.1:12345/bunny_46980bps/BigBuckBunny_1s_init.mp4
+2024-01-19 04:45:07,697 - dash_client.py:476 - INFO - BASIC : The total downloaded = 936, segment_size = 936, segment_number = 1
+2024-01-19 04:45:07,698 - dash_buffer.py:203 - INFO - Writing segment 1 at time 2.14576721191e-06
+2024-01-19 04:45:07,698 - dash_buffer.py:271 - INFO - BufferStats: EpochTime=0,CurrentPlaybackTime=0,CurrentBufferSize=1,CurrentPlaybackState=INITIAL_BUFFERING,Action=Writing,Bitrate=46980
+2024-01-19 04:45:07,698 - dash_client.py:490 - INFO - Downloaded http://127.0.0.1:12345/bunny_46980bps/BigBuckBunny_1s_init.mp4. Size = 936 in 0.508008003235 seconds
+2024-01-19 04:45:07,699 - dash_client.py:369 - INFO - *************** segment_number:2*********************
+2024-01-19 04:45:07,699 - dash_client.py:370 - INFO -  BASIC: Processing the segment 2
+2024-01-19 04:45:07,700 - basic_dash2.py:59 - INFO - Basic Adaptation: Download Rate = 14739.9252616, next_bitrate = 46980.0
+2024-01-19 04:45:07,700 - dash_client.py:391 - INFO - Basic-DASH: Selected 46980.0 for the segment 3
+2024-01-19 04:45:07,700 - dash_client.py:440 - INFO - BASIC: Segment URL = http://127.0.0.1:12345/bunny_46980bps/BigBuckBunny_1s1.m4s
+2024-01-19 04:45:07,700 - dash_buffer.py:136 - INFO - Initial Waiting Time = 0.510476827621
+2024-01-19 04:45:07,701 - dash_buffer.py:64 - INFO - Changing state from INITIAL_BUFFERING to PLAY at 0 Playback time 
+2024-01-19 04:45:07,701 - dash_buffer.py:271 - INFO - BufferStats: EpochTime=3,CurrentPlaybackTime=0,CurrentBufferSize=1,CurrentPlaybackState=PLAY,Action=InitialBuffering-Play,Bitrate=0
+2024-01-19 04:45:07,701 - dash_buffer.py:159 - INFO - Reading the segment number 1 from the buffer at playtime 0
+2024-01-19 04:45:07,701 - dash_buffer.py:271 - INFO - BufferStats: EpochTime=4,CurrentPlaybackTime=0,CurrentBufferSize=0,CurrentPlaybackState=PLAY,Action=StillPlaying,Bitrate=46980
+2024-01-19 04:45:07,702 - dash_buffer.py:172 - INFO - Started playing with representation 46980 at 0
+2024-01-19 04:45:08,702 - dash_buffer.py:147 - INFO - Buffer empty after 1 seconds of playback
+2024-01-19 04:45:08,702 - dash_buffer.py:64 - INFO - Changing state from PLAY to BUFFERING at 1 Playback time 
+2024-01-19 04:45:08,703 - dash_buffer.py:271 - INFO - BufferStats: EpochTime=1005,CurrentPlaybackTime=1,CurrentBufferSize=0,CurrentPlaybackState=BUFFERING,Action=Play-Buffering,Bitrate=0
+2024-01-19 04:45:08,703 - dash_buffer.py:107 - INFO - Entering buffering stage after 1 seconds of playback
