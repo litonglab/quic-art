@@ -372,7 +372,7 @@ lsquic_send_ctl_init (lsquic_send_ctl_t *ctl, struct lsquic_alarmset *alset,
     ctl->sc_remained_dup_num = 0;
     ctl->sc_pre_dup_packet = NULL;
     // 1 means run art, 0 means not
-    ctl->sc_art_flag = 0;
+    ctl->sc_art_flag = 1;
     ctl->sc_all_retrans_packet_num = 0;
     ctl->sc_largest_feedbback_window = 10;
     ctl->sc_feedback_window_size = 0;
@@ -381,8 +381,8 @@ lsquic_send_ctl_init (lsquic_send_ctl_t *ctl, struct lsquic_alarmset *alset,
     ctl->sc_lost_packet_number = 0;
     assert(!(flags & ~(SC_IETF|SC_NSTP|SC_ECN)));
     ctl->sc_flags = flags;
-    ctl->sc_multi_arm_flag = 1;
-    assert(ctl->sc_multi_arm_flag != ctl->sc_art_flag);
+    ctl->sc_multi_arm_flag = 0;
+    // assert(ctl->sc_multi_arm_flag != ctl->sc_art_flag);
     ctl->sc_all_arms = malloc(NUM_OF_ARMS * sizeof(struct arm_of_bandit));
     // config file exists
     if (access(ARM_SAVE_PATH, 0) == 0)
@@ -1164,7 +1164,7 @@ send_ctl_handle_regular_lost_packet (struct lsquic_send_ctl *ctl,
                 if (ctl->sc_multi_arm_flag)
                 {
                     //arm_index is 0-9, but arm is 1-10
-                    //unsigned dup_number = select_arm_with_epsilon_greedy_policy(ctl) + 1;
+                    // unsigned dup_number = select_arm_with_epsilon_greedy_policy(ctl) + 1;
                     unsigned dup_number = select_arm_with_ucb_policy(ctl) + 1;
                     packet_out->po_need_retrans_number = dup_number > 0 ? dup_number : 1;
                     packet_out->po_fake_loss_rec = 1;
@@ -1583,7 +1583,8 @@ lsquic_send_ctl_got_ack (lsquic_send_ctl_t *ctl,
                 lsquic_packet_out_ack_streams(packet_out);
                 LSQ_DEBUG("acking via regular record %"PRIu64,
                                                         packet_out->po_packno);
-                calc_multi_armed_bandit_reward(ctl, packet_out, now);
+                if (ctl->sc_multi_arm_flag)
+		    calc_multi_armed_bandit_reward(ctl, packet_out, now);
             }
             else if (packet_out->po_flags & PO_LOSS_REC)
             {
@@ -1598,7 +1599,8 @@ lsquic_send_ctl_got_ack (lsquic_send_ctl_t *ctl,
                                                                     po_next);
                 LSQ_DEBUG("acking via loss record %"PRIu64,
                                                         packet_out->po_packno);
-                calc_multi_armed_bandit_reward(ctl, packet_out, now);
+                if (ctl->sc_multi_arm_flag)
+		    calc_multi_armed_bandit_reward(ctl, packet_out, now);
                 send_ctl_maybe_increase_reord_thresh(ctl, packet_out,
                                                             prev_largest_acked);
 #if LSQUIC_CONN_STATS
@@ -2718,7 +2720,8 @@ lsquic_send_ctl_reschedule_packets (lsquic_send_ctl_t *ctl)
         packet_out->po_retrans_no = old_packno;
         lsquic_send_ctl_scheduled_one(ctl, packet_out);
         LSQ_ERROR("ART detect %"PRIu64" has been retransmit %u times, new packno is %"PRIu64" now packet number is %u", old_packno, packet_out->po_retrans_times, packet_out->po_packno, packet_out->po_retrans_packet_number);
-        if(((ctl->sc_art_flag || ctl->sc_multi_arm_flag) && packet_out->po_frame_types != QUIC_FTBIT_PADDING) && (packet_out->po_frame_types & (1 << QUIC_FRAME_STREAM)))
+        // if(((ctl->sc_art_flag || ctl->sc_multi_arm_flag) && packet_out->po_frame_types != QUIC_FTBIT_PADDING) && (packet_out->po_frame_types & (1 << QUIC_FRAME_STREAM)))
+        if((packet_out->po_frame_types != QUIC_FTBIT_PADDING) && (packet_out->po_frame_types & (1 << QUIC_FRAME_STREAM)))
         {
             if (!lsquic_alarmset_is_set(ctl->sc_alset, AL_ART_SCHE))
             {
