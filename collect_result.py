@@ -28,6 +28,20 @@ def analyze_line(line, lost_dict, recovery_dict):
             recovery_dict[lost_number] = []
         recovery_dict[lost_number].append(recovery_time)
         return int(temp_round), recovery_time, None, None
+    if "ack_or_not: 1" in line:
+        # print(line)
+        numbers = re.findall(r'\b\d+\.\d+|\b\d+\b', line)
+        lost_number = numbers[-1]
+        packno = numbers[-2]
+        temp_round = numbers[-13]
+        receive_time = numbers[-20]
+        recovery_time = None
+        if lost_number in lost_dict.keys():
+            recovery_time = int(receive_time) - int(lost_dict[lost_number])
+        if lost_number not in recovery_dict.keys():
+            recovery_dict[lost_number] = []
+        recovery_dict[lost_number].append(recovery_time)
+        return int(temp_round), recovery_time, None, None
     if " bytes/sec" in line:
         numbers = re.findall(r'\d+', line)
         temp_throughput = numbers[-1]
@@ -64,7 +78,8 @@ def analyze_file(file_path, result_path):
             if temp_throughput is not None:
                 throughput = temp_throughput * 8
             line = file.readline()
-        print(f"redundancy is: {redundancy}\nthroughput is: {throughput} bps\nmax_round is: {max(round_list)}\nmax_recovery_time is: ")
+        if len(round_list) > 0:
+            print(f"redundancy is: {redundancy}\nthroughput is: {throughput} bps\nmax_round is: {max(round_list)}\nmax_recovery_time is: ")
         print(round_list)
 
     with open(result_csv_path, 'w', newline='') as csvfile:
