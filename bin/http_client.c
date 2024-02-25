@@ -348,7 +348,10 @@ http_client_on_conn_closed (lsquic_conn_t *conn)
     if (conn_h->client_ctx->hcc_flags & HCC_ABORT_ON_INCOMPLETE)
     {
         if (!(conn_h->client_ctx->hcc_flags & HCC_SEEN_FIN))
-            abort();
+        {
+            LSQ_INFO("abort incomplete connection");
+            exit(1);
+        }
     }
     --conn_h->client_ctx->hcc_n_open_conns;
 
@@ -513,18 +516,15 @@ http_client_on_new_stream (void *stream_if_ctx, lsquic_stream_t *stream)
     st_h->sh_created = lsquic_time_now();
     if (st_h->client_ctx->hcc_cur_pe)
     {
-        LSQ_INFO("now client hcc_cur is %s", st_h->client_ctx->hcc_cur_pe->path);
         st_h->client_ctx->hcc_cur_pe = TAILQ_NEXT(
                                         st_h->client_ctx->hcc_cur_pe, next_pe);
         if (!st_h->client_ctx->hcc_cur_pe)  /* Wrap around */
             st_h->client_ctx->hcc_cur_pe =
                                 TAILQ_FIRST(&st_h->client_ctx->hcc_path_elems);
-        LSQ_INFO("after client hcc_cur is %s", st_h->client_ctx->hcc_cur_pe->path);
     }
     else
         st_h->client_ctx->hcc_cur_pe = TAILQ_FIRST(
                                             &st_h->client_ctx->hcc_path_elems);
-    LSQ_INFO("finally client hcc_cur is %s", st_h->client_ctx->hcc_cur_pe->path);
     st_h->path = st_h->client_ctx->hcc_cur_pe->path;
     if (st_h->client_ctx->payload)
     {
@@ -904,11 +904,26 @@ http_client_on_close (lsquic_stream_t *stream, lsquic_stream_ctx_t *st_h)
     }
     else
     {
+	LSQ_INFO( "downloaded %lu application bytes\n",
+            s_stat_downloaded_bytes);
+        s_stat_downloaded_bytes = 0;
         LSQ_INFO("%u active stream, %u request remain, creating %u new stream",
             conn_h->ch_n_cc_streams,
             conn_h->ch_n_reqs - conn_h->ch_n_cc_streams,
             MIN((conn_h->ch_n_reqs - conn_h->ch_n_cc_streams),
                 (client_ctx->hcc_cc_reqs_per_conn - conn_h->ch_n_cc_streams)));
+	struct path_elem *pe;
+        pe = calloc(1, sizeof(*pe));
+        char user_input[256];
+        if (fgets(user_input, sizeof(user_input), stdin) != NULL)
+        {
+            setbuf(stdin, NULL);
+            user_input[strcspn(user_input, "\n")] = '\0';
+            pe->path = strdup(user_input);
+            LSQ_INFO("Path of appended request: %s\n", pe->path);
+            TAILQ_INSERT_TAIL(&client_ctx->hcc_path_elems, pe, next_pe);
+
+        }
         create_streams(client_ctx, conn_h);
     }
     if (st_h->reader.lsqr_ctx)
@@ -1014,6 +1029,7 @@ usage (const char *prog)
 "                 content-type: application/octet-stream and\n"
 "                 content-length\n"
 "   -K          Discard server response\n"
+"   -B          Header bypass\n"
 "   -I          Abort on incomplete reponse from server\n"
 "   -4          Prefer IPv4 when resolving hostname\n"
 "   -6          Prefer IPv6 when resolving hostname\n"
@@ -1605,7 +1621,6 @@ main (int argc, char **argv)
     struct http_client_ctx client_ctx;
     struct stat st;
     struct path_elem *pe;
-    char *pstring;
     struct sport_head sports;
     struct prog prog;
     const char *token = NULL;
@@ -1699,20 +1714,9 @@ main (int argc, char **argv)
             prog.prog_hostname = optarg;            /* Pokes into prog */
             break;
         case 'p':
-            pstring = strtok(optarg, ",");
-            while (pstring != NULL)
-            {
-                pe = calloc(1, sizeof(*pe));
-                pe->path = pstring;
-                fprintf(stdout, "path add %s\n", pstring);
-                TAILQ_INSERT_TAIL(&client_ctx.hcc_path_elems, pe, next_pe);
-                pstring = strtok(NULL, ",");
-            }
-            // pe = calloc(1, sizeof(*pe));
-            // pe->path = optarg;
-            // TAILQ_INSERT_TAIL(&client_ctx.hcc_path_elems, pe, next_pe);
-            // LSQ_INFO("add path %s ", optarg);
-            // printf("add path %s ", optarg);
+            pe = calloc(1, sizeof(*pe));
+            pe->path = optarg;
+            TAILQ_INSERT_TAIL(&client_ctx.hcc_path_elems, pe, next_pe);
             break;
         case 'h':
             usage(argv[0]);
@@ -1842,6 +1846,7 @@ main (int argc, char **argv)
         fprintf(stderr, "Specify at least one path using -p option\n");
         exit(1);
     }
+
     start_time = lsquic_time_now();
     was_empty = TAILQ_EMPTY(&sports);
     if (0 != prog_prep(&prog))
