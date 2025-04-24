@@ -39,6 +39,8 @@ some compilation and run-time options.
 To build LSQUIC, you need CMake, zlib, and BoringSSL.  The example program
 uses libevent to provide the event loop.
 
+> Tips: The recommended Linux Distribution is Ubuntu 18.04.
+
 ## Building BoringSSL
 
 BoringSSL is not packaged; you have to build it yourself.  The process is
@@ -50,6 +52,8 @@ straightforward.  You will need `go` installed.
 git clone https://boringssl.googlesource.com/boringssl
 cd boringssl
 ```
+
+We also provide [snapshot](https://github.com/litonglab/Boringssl) for users in China, where may be inconvenient to access google source.
 
 You may need to install pre-requisites like zlib and libevent.
 
